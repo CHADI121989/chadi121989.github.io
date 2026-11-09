@@ -274,6 +274,19 @@ nav.abas button[aria-current="page"] b{background:linear-gradient(135deg,rgba(24
 .heroi-escuro{background:var(--brilho);border-radius:24px;padding:22px 16px 18px;margin:4px 0 16px;display:grid;place-items:center;box-shadow:0 10px 30px rgba(16,26,60,.18)}
 .heroi-escuro img{width:min(170px,45vw);height:auto;display:block}
 
+/* Celular: nada pode passar da largura da tela (senão a página "corre" para os lados e o navegador dá zoom).
+   Campos de data do iPhone são largos por natureza; grades e fieldsets precisam poder encolher. */
+html,body{overflow-x:hidden;max-width:100%}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+fieldset{min-width:0;margin:0;padding:0;border:0}
+.grade2>*,.grade3>*,label.cp,.cartao,.dlg-corpo{min-width:0}
+input,select,textarea{max-width:100%;min-width:0}
+input[type=date],input[type=time],input[type=datetime-local]{-webkit-appearance:none;appearance:none;display:block;text-align:left}
+input::-webkit-date-and-time-value{text-align:left}
+dialog{max-width:min(560px,100vw);overflow-x:hidden}
+img,svg{max-width:100%}
+.btns>.btn{max-width:100%;white-space:normal}
+
 @media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)} .grade3{grid-template-columns:1fr 1fr} nav.abas button{font-size:.66rem}}
 </style>
 </head>
