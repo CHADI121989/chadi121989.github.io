@@ -1,333 +1,606 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Nunnez</title>
-<meta name="description" content="Divida os gastos da viagem com os amigos de um jeito justo e acerte tudo por Pix.">
-<meta name="theme-color" content="#101a3c">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Nunnez">
-<style>
-/* Cores tiradas do logo Nunnez: marinho, laranja, verde-água e azul. */
-:root{
-  --marinho:#101a3c; --laranja:#f7931e; --agua:#2ad4b4; --azul:#3aa0f0; --creme:#f5f1e6;
-  --marca:linear-gradient(135deg,var(--laranja) 0%,var(--agua) 55%,var(--azul) 100%);
-  --topo:var(--marinho); --topo-tx:var(--creme);
-  --bg:#f4f5fa; --card:#ffffff; --tx:#101a3c; --mut:#5a6386; --lin:#e0e3ef;
-  --pri:#1fbfa2; --pri2:#3aa0f0; --pri-tx:#0b1433; --suave:#e3f7f3;
-  --pos:#0f8f78; --neg:#d9531e; --ali:#b45d06; --ali-bg:#fff1dd;
-  --sombra:0 1px 2px rgba(16,26,60,.06),0 4px 14px rgba(16,26,60,.07);
-  --r:14px;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --topo:#0a1130;
-    --bg:#0c1330; --card:#141d44; --tx:#f5f1e6; --mut:#9ba4c8; --lin:#25305c;
-    --pri:#2ad4b4; --pri2:#3aa0f0; --pri-tx:#0b1433; --suave:#16304a;
-    --pos:#2ad4b4; --neg:#ff9f45; --ali:#ffb547; --ali-bg:#3a2a12;
-    --sombra:0 1px 2px rgba(0,0,0,.35);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas</title>
+<meta name="description" content="GTA-SA-Minecraft is a free ASI mod for GTA San Andreas that adds Minecraft gameplay: mine and build blocks in Los Santos, craft items, survive nights, fight Creepers and the Warden, blow up the map with TNT, and drive cars in one combined world.">
+<meta name="keywords" content="GTA SA Minecraft, GTA San Andreas Minecraft mod, ASI mod, minecraft mod, gta mod, voxel, crafting, survival, plugin-sdk, Los Santos, Creeper, Warden, TNT, sandbox">
+<meta name="author" content="CHADI121989">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#4b2f8f">
+<link rel="canonical" href="https://github.com/CHADI121989/GTA-SA-Minecraft">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas">
+<meta property="og:description" content="Play Minecraft and GTA San Andreas together in one world. Mine blocks in Los Santos, craft, survive, fight Creepers and the Warden, dig with TNT, and drive cars. Free ASI mod for Windows.">
+<meta property="og:url" content="https://github.com/CHADI121989/GTA-SA-Minecraft">
+<meta property="og:site_name" content="GTA-SA-Minecraft">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas">
+<meta name="twitter:description" content="A free crossover mod that puts Minecraft mining, building, crafting and survival into the world of GTA San Andreas.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "GTA-SA-Minecraft",
+  "applicationCategory": "GameModification",
+  "operatingSystem": "Windows",
+  "description": "Minecraft mod for GTA San Andreas: play Minecraft and GTA SA together in one world. Mine and build blocks in Los Santos, craft, survive, fight Creepers and the Warden, dig into the map with TNT, drive cars.",
+  "url": "https://github.com/CHADI121989/GTA-SA-Minecraft",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
   }
 }
-:root[data-theme="dark"]{
-  --topo:#0a1130;
-  --bg:#0c1330; --card:#141d44; --tx:#f5f1e6; --mut:#9ba4c8; --lin:#25305c;
-  --pri:#2ad4b4; --pri2:#3aa0f0; --pri-tx:#0b1433; --suave:#16304a;
-  --pos:#2ad4b4; --neg:#ff9f45; --ali:#ffb547; --ali-bg:#3a2a12;
-  --sombra:0 1px 2px rgba(0,0,0,.35);
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
-body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-button,input,select,textarea{font:inherit;color:inherit}
-h1,h2,h3{margin:0;line-height:1.2}
-.oculto{display:none!important}
-.mut{color:var(--mut)} .pos{color:var(--pos)} .neg{color:var(--neg)}
-.peq{font-size:.86rem}
-.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-
-/* Topo */
-header{position:sticky;top:0;z-index:5;background:var(--topo);color:var(--topo-tx);border-bottom:3px solid transparent;border-image:var(--marca) 1;padding:calc(10px + env(safe-area-inset-top)) 16px 12px}
-header .lin{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
-header h1{font-size:1.15rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-header .sub{font-size:.8rem;opacity:.85}
-.ic-btn{background:transparent;border:0;color:inherit;width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1.15rem;display:grid;place-items:center}
-.ic-btn:hover{background:rgba(255,255,255,.14)}
-#btn-conta{flex:none;width:38px;height:38px;border-radius:50%;background:var(--marca);color:#fff;font-weight:800;font-size:1.05rem;text-shadow:0 1px 2px rgba(0,0,0,.3);box-shadow:0 0 0 2px rgba(255,255,255,.3),0 4px 12px rgba(0,0,0,.25)}
-#btn-conta:hover{background:var(--marca);filter:brightness(1.08)}
-#btn-conta img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
-#btn-conta:has(img){padding:2px}
-/* Foto de perfil: círculo com borda em degradê da marca */
-.perfil-topo{display:grid;justify-items:center;gap:10px;margin-bottom:10px}
-.perfil-foto{width:88px;height:88px;border-radius:50%;padding:3px;background:var(--marca);display:grid;place-items:center;color:#fff;font-size:2.2rem;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 18px rgba(16,26,60,.2)}
-.perfil-foto img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid var(--card)}
-.lista .ico.foto-perfil{border-radius:50%;padding:2px;background:var(--marca)}
-.lista .ico.foto-perfil img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
-.status{font-size:.75rem;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.18);white-space:nowrap}
-
-main{max-width:760px;margin:0 auto;padding:16px}
-.cartao{background:var(--card);border:1px solid var(--lin);border-radius:var(--r);box-shadow:var(--sombra);padding:16px;margin-bottom:14px}
-.cartao h2{font-size:1.02rem;margin-bottom:10px}
-.cartao a{color:var(--pri2)}
-.trecho{margin:-4px 0 10px 22px;padding:6px 0 6px 14px;border-left:3px dashed var(--lin);font-size:.84rem}
-.trecho a{color:var(--pri2)}
-details.cartao>summary{list-style:none}
-details.cartao>summary::-webkit-details-marker{display:none}
-.titulo-sec{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:18px 4px 8px;font-weight:600}
-
-/* Botões e campos */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--lin);background:var(--card);border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;min-height:44px}
-a.btn{text-decoration:none;color:var(--tx)}
-.btn.pri{background:var(--pri);border-color:var(--pri);color:var(--pri-tx)}
-.btn.sua{background:var(--suave);border-color:transparent;color:var(--tx)}
-.btn.perigo{color:var(--neg)}
-.btn.lg{width:100%}
-.btn.mini{min-height:34px;padding:6px 10px;font-size:.88rem;border-radius:10px}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-label.cp{display:block;margin-bottom:12px}
-label.cp>span{display:block;font-size:.85rem;color:var(--mut);margin-bottom:4px;font-weight:600}
-input[type=text],input[type=date],input[type=number],input[type=password],input[type=email],input[type=datetime-local],input[type=time],input[type=url],select,textarea{width:100%;border:1px solid var(--lin);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px}
-textarea{min-height:80px;resize:vertical}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--pri2);outline-offset:0;border-color:transparent}
-.grade2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grade2>label.cp{display:flex;flex-direction:column;justify-content:flex-end}
-.grade3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.dica{font-size:.82rem;color:var(--mut);margin:-6px 0 12px}
-.btn+.dica,.btns+.dica{margin-top:10px}
-.check{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer}
-.check input{width:20px;height:20px;accent-color:var(--pri)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--lin);background:var(--card);border-radius:99px;padding:6px 11px;font-size:.88rem;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:var(--pri-tx)}
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.cats button{border:1px solid var(--lin);background:var(--bg);border-radius:12px;padding:8px 2px;cursor:pointer;font-size:.72rem;line-height:1.15;min-height:62px}
-.cats button b{display:block;font-size:1.35rem;font-weight:400;margin-bottom:3px}
-.cats button[aria-pressed="true"]{background:var(--suave);border-color:var(--pri);outline:1px solid var(--pri)}
-
-/* Listas */
-.lista{list-style:none;margin:0;padding:0}
-.lista li{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--lin)}
-.lista li:first-child{border-top:0}
-.lista .ico{width:40px;height:40px;border-radius:12px;background:var(--suave);display:grid;place-items:center;font-size:1.2rem;flex:none}
-.lista .meio{flex:1;min-width:0}
-.lista .meio b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-.lista .meio small{color:var(--mut);font-size:.82rem;display:block}
-.lista li.clica{cursor:pointer}
-.selo{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--ali-bg);color:var(--ali);margin-left:4px;vertical-align:1px}
-.dia{font-size:.8rem;color:var(--mut);font-weight:700;margin:16px 4px 6px;display:flex;justify-content:space-between}
-.vazio{text-align:center;padding:28px 12px;color:var(--mut)}
-.vazio b{display:block;font-size:2rem;margin-bottom:6px}
-
-/* Resumo no topo da aba gastos */
-.placar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
-.placar .cartao{margin:0;padding:12px 14px}
-.placar small{display:block;color:var(--mut);font-size:.78rem;font-weight:600}
-.placar strong{font-size:1.25rem}
-
-/* Barras */
-.barra{height:10px;border-radius:99px;background:var(--lin);overflow:hidden;margin-top:5px;position:relative}
-.barra i{display:block;height:100%;background:var(--pri);border-radius:99px}
-.barra i.plan{position:absolute;top:0;left:0;background:transparent;border-right:3px solid var(--tx);border-radius:0}
-.linha-bar{margin-bottom:12px}
-.linha-bar .t{display:flex;justify-content:space-between;gap:8px;font-size:.9rem}
-
-/* Transferências */
-.transf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--lin)}
-.transf:first-of-type{border-top:0}
-.transf .quem{flex:1;min-width:180px}
-.seta{color:var(--mut);margin:0 4px}
-
-/* Navegação inferior */
-nav.abas{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--lin);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
-nav.abas .in{display:flex;max-width:760px;width:100%}
-nav.abas button{flex:1;border:0;background:transparent;padding:8px 2px 9px;font-size:.7rem;color:var(--mut);cursor:pointer;min-height:58px}
-nav.abas button b{display:block;font-size:1.25rem;font-weight:400;line-height:1.3}
-nav.abas button[aria-current="page"]{color:var(--pri);font-weight:700}
-.fab{position:fixed;right:max(16px,calc(50% - 364px));bottom:calc(74px + env(safe-area-inset-bottom));z-index:7;width:58px;height:58px;border-radius:18px;border:0;background:var(--marca);color:#fff;font-size:1.9rem;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 6px 18px rgba(247,147,30,.35);cursor:pointer}
-.logo-top{height:34px;width:34px;border-radius:9px;object-fit:cover;flex:none}
-.heroi img{width:min(220px,60vw);height:auto;border-radius:22px;display:block;margin:0 auto 4px}
-.destaque{background:var(--marca)!important;color:#fff!important;border:0!important}
-.destaque .peq{opacity:.95}
-
-/* Janela (dialog) */
-dialog{border:0;border-radius:18px 18px 0 0;padding:0;width:100%;max-width:560px;max-height:92vh;margin:auto auto 0;background:var(--card);color:var(--tx)}
-dialog::backdrop{background:rgba(5,15,13,.55)}
-@media (min-width:640px){dialog{border-radius:18px;margin:auto}}
-.dlg-top{position:sticky;top:0;background:var(--card);display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--lin);z-index:1}
-.dlg-top h2{flex:1;font-size:1.08rem}
-.dlg-corpo{padding:16px;overflow:auto}
-.dlg-pe{position:sticky;bottom:0;background:var(--card);padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--lin);display:flex;gap:8px}
-.dlg-pe .btn{flex:1}
-.previa{background:var(--suave);border-radius:12px;padding:10px 12px;font-size:.88rem;margin-bottom:12px}
-.previa b{font-weight:700}
-.qr{display:grid;place-items:center;background:#fff;border-radius:12px;padding:12px;margin:0 auto 12px;max-width:260px}
-.qr svg,.qr img{width:100%;height:auto}
-.copia{font-family:ui-monospace,Consolas,monospace;font-size:.75rem;word-break:break-all;background:var(--bg);border:1px solid var(--lin);border-radius:10px;padding:10px;margin-bottom:10px}
-
-/* Início */
-.heroi{text-align:center;padding:26px 8px 10px}
-.heroi .logo{font-size:3rem}
-.heroi h1{font-size:1.6rem;margin:6px 0}
-.vantagens{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
-.vantagens div{background:var(--card);border:1px solid var(--lin);border-radius:12px;padding:10px;font-size:.84rem}
-.vantagens b{display:block;font-size:1.2rem}
-
-/* Tela de login: cheia, centralizada, sem a barra de cima */
-body.modo-login{padding-bottom:0}
-body.modo-login header{display:none}
-body.modo-login main{max-width:none;padding:0}
-.login-wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px calc(32px + env(safe-area-inset-bottom));
-  background:radial-gradient(60% 40% at 15% 10%,rgba(247,147,30,.18),transparent 70%),radial-gradient(55% 45% at 90% 20%,rgba(58,160,240,.18),transparent 70%),radial-gradient(60% 50% at 50% 100%,rgba(42,212,180,.16),transparent 70%),var(--marinho)}
-.login-logo{width:min(180px,48vw);height:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
-.login-titulo{color:var(--creme);font-size:1.45rem;font-weight:800;margin:18px 0 2px;text-align:center}
-.login-sub{color:#9ba4c8;font-size:.92rem;margin:0 0 22px;text-align:center}
-.login-card{width:100%;max-width:400px;background:rgba(20,29,68,.92);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);color:var(--creme);backdrop-filter:blur(6px)}
-.login-card label.cp>span{color:#9ba4c8}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(0,0,0,.25);border-radius:14px;padding:4px;margin-bottom:20px}
-.seg button{border:0;background:transparent;color:#9ba4c8;font-weight:700;padding:10px;border-radius:11px;cursor:pointer;font-size:.95rem}
-.seg button[aria-pressed="true"]{background:var(--agua);color:var(--marinho);box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.campo-ic{position:relative}
-.campo-ic>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-style:normal;opacity:.75;pointer-events:none}
-.campo-ic>input{padding-left:44px!important;background:rgba(0,0,0,.25)!important;border-color:rgba(255,255,255,.1)!important;color:var(--creme)!important;min-height:50px!important;border-radius:12px!important}
-.campo-ic>button.olho{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#9ba4c8;cursor:pointer;font-size:1rem;padding:6px}
-.btn-marca{width:100%;border:0;border-radius:14px;min-height:52px;font-weight:800;font-size:1.02rem;color:#fff;background:var(--marca);text-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer;box-shadow:0 8px 22px rgba(42,212,180,.25)}
-.btn-marca:disabled{opacity:.7}
-.login-card a{color:var(--agua)}
-.login-rodape{color:#6f79a3;font-size:.78rem;margin-top:18px;text-align:center}
-.login-aviso{width:100%;max-width:400px;background:rgba(42,212,180,.12);border:1px solid rgba(42,212,180,.35);color:var(--creme);border-radius:14px;padding:10px 14px;font-size:.88rem;margin-bottom:14px;text-align:center}
-dialog #toast{bottom:calc(96px + env(safe-area-inset-bottom))}
-#toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.on{opacity:1}
-.aviso{background:var(--ali-bg);color:var(--ali);border-radius:12px;padding:10px 12px;font-size:.86rem;margin-bottom:12px}
-
-/* ===== Visual novo (mesmo clima da tela de login) ===== */
-:root{--r:18px;--brilho:radial-gradient(70% 90% at 0% 0%,rgba(247,147,30,.26),transparent 60%),radial-gradient(60% 90% at 100% 0%,rgba(58,160,240,.30),transparent 60%),radial-gradient(80% 80% at 50% 130%,rgba(42,212,180,.26),transparent 60%),var(--marinho)}
-:root:not([data-theme="dark"]){--bg:#f2f4fa;--lin:#e4e7f1;--sombra:0 1px 2px rgba(16,26,60,.04),0 8px 24px rgba(16,26,60,.07)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b1230;--lin:#232e5a;--sombra:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}}
-:root[data-theme="dark"]{--bg:#0b1230;--lin:#232e5a;--sombra:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}
-
-/* Topo dentro da viagem: marinho com os brilhos da marca, nome grande, destino, contagem e o grupo */
-body.em-viagem header{position:relative;border:0;border-image:none;border-radius:0 0 26px 26px;padding-bottom:18px;background:var(--brilho);box-shadow:0 10px 30px rgba(16,26,60,.18)}
-body.em-viagem header h1{font-size:1.4rem;font-weight:800;letter-spacing:-.01em}
-body.em-viagem header .sub{opacity:.75;margin-top:2px}
-body.em-viagem main{padding-top:18px}
-.hero-v{max-width:760px;margin:14px auto 0;display:flex;align-items:center;gap:10px}
-.hv-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
-.hv-chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:5px 11px;font-size:.8rem;font-weight:600;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.hv-avs{display:flex;align-items:center;padding:0 0 0 8px;border:0;background:transparent;cursor:pointer;flex:none}
-.av{width:32px;height:32px;border-radius:50%;background:var(--av,var(--agua));color:#0b1433;font-weight:800;font-size:.85rem;display:inline-grid;place-items:center;flex:none}
-.hv-avs .av{margin-left:-9px;border:2px solid var(--marinho);box-shadow:0 2px 6px rgba(0,0,0,.25)}
-.hv-avs .av.mais{background:rgba(255,255,255,.2);color:var(--creme);font-size:.75rem}
-.lista .ico.av{border-radius:50%;background:var(--av);color:#0b1433;font-size:1.05rem;font-weight:800}
-.lista .ico.av.pq{width:34px;height:34px;font-size:.9rem}
-
-/* Cartões, listas e botões mais leves e arredondados */
-.cartao{border-color:transparent;padding:18px}
-:root[data-theme="dark"] .cartao{border-color:var(--lin)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cartao{border-color:var(--lin)}}
-.cartao h2{font-size:1.06rem;font-weight:800}
-.titulo-sec{display:flex;align-items:center;gap:8px;color:var(--mut);font-weight:800;letter-spacing:.07em;font-size:.76rem;margin:22px 4px 10px}
-.titulo-sec::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--marca);flex:none}
-.lista .ico{border-radius:14px;background:linear-gradient(135deg,rgba(247,147,30,.14),rgba(42,212,180,.14) 55%,rgba(58,160,240,.16))}
-.lista li{padding:12px 0}
-.btn{border-radius:14px;transition:transform .08s,filter .15s}
-.btn:active{transform:scale(.97)}
-.btn.pri{background:linear-gradient(135deg,#2ad4b4,#25bcd8);border-color:transparent;box-shadow:0 4px 14px rgba(42,212,180,.28)}
-.btn.mini{border-radius:99px;padding:6px 12px}
-.chip{padding:7px 13px;font-weight:600}
-.chip[aria-pressed="true"]{background:linear-gradient(135deg,#2ad4b4,#25bcd8);border-color:transparent}
-.destaque{box-shadow:0 10px 28px rgba(42,212,180,.25)!important;border-radius:22px!important}
-.placar .cartao{padding:14px 16px}
-.placar strong{font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
-.dia{color:var(--tx);opacity:.65;text-transform:capitalize}
-
-/* Barra de abas flutuante; a aba atual ganha um destaque com as cores da marca */
-body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
-nav.abas{left:0;right:0;margin:0 auto;width:calc(100% - 20px);max-width:740px;bottom:calc(10px + env(safe-area-inset-bottom));padding:4px;border:1px solid var(--lin);border-radius:24px;background:var(--card);box-shadow:0 10px 30px rgba(16,26,60,.18)}
-@supports (backdrop-filter:blur(1px)){nav.abas{background:color-mix(in srgb,var(--card) 86%,transparent);backdrop-filter:blur(14px)}}
-nav.abas button{min-height:56px;border-radius:18px;font-weight:600;padding:6px 1px 7px}
-nav.abas button b{width:46px;height:28px;margin:0 auto 1px;border-radius:14px;display:grid;place-items:center;font-size:1.15rem;transition:background .2s}
-nav.abas button[aria-current="page"]{color:var(--tx);font-weight:800}
-nav.abas button[aria-current="page"] b{background:linear-gradient(135deg,rgba(247,147,30,.25),rgba(42,212,180,.28) 55%,rgba(58,160,240,.3))}
-.fab{bottom:calc(88px + env(safe-area-inset-bottom));border-radius:50%;width:60px;height:60px;box-shadow:0 10px 24px rgba(42,212,180,.35),0 4px 10px rgba(247,147,30,.25)}
-
-/* Formas de pagamento */
-.formas{display:grid;gap:10px}
-.forma{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--lin);background:var(--bg);border-radius:16px;padding:14px;cursor:pointer;color:var(--tx);width:100%}
-.forma:hover:not(:disabled){border-color:var(--pri)}
-.forma:disabled{opacity:.55;cursor:not-allowed}
-.forma>b{font-size:1.6rem;font-weight:400;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,rgba(247,147,30,.16),rgba(42,212,180,.16) 55%,rgba(58,160,240,.18))}
-.forma>span{font-weight:800;font-size:1rem}
-.forma small{display:block;font-weight:400;font-size:.82rem;color:var(--mut);margin-top:2px}
-.rot-cp{display:block;font-size:.85rem;color:var(--mut);margin-bottom:6px;font-weight:600}
-.formas-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
-.formas-mini label{cursor:pointer}
-.formas-mini input{position:absolute;opacity:0;pointer-events:none}
-.formas-mini span{display:block;text-align:center;border:1px solid var(--lin);background:var(--bg);border-radius:12px;padding:10px 4px;font-weight:700;font-size:.9rem}
-.formas-mini input:checked+span{background:linear-gradient(135deg,#2ad4b4,#25bcd8);border-color:transparent;color:var(--pri-tx)}
-.formas-mini input:focus-visible+span{outline:2px solid var(--pri2)}
-
-/* Logo sem fundo sobre um cartão marinho (tela inicial e entrada pela viagem) */
-.heroi-escuro{background:var(--brilho);border-radius:24px;padding:22px 16px 18px;margin:4px 0 16px;display:grid;place-items:center;box-shadow:0 10px 30px rgba(16,26,60,.18)}
-.heroi-escuro img{width:min(170px,45vw);height:auto;display:block}
-
-/* Celular: nada pode passar da largura da tela (senão a página "corre" para os lados e o navegador dá zoom).
-   Campos de data do iPhone são largos por natureza; grades e fieldsets precisam poder encolher. */
-html,body{overflow-x:hidden;max-width:100%}
-@supports (overflow:clip){html,body{overflow-x:clip}}
-fieldset{min-width:0;margin:0;padding:0;border:0}
-.grade2>*,.grade3>*,label.cp,.cartao,.dlg-corpo{min-width:0}
-input,select,textarea{max-width:100%;min-width:0}
-input[type=date],input[type=time],input[type=datetime-local]{-webkit-appearance:none;appearance:none;display:block;text-align:left}
-input::-webkit-date-and-time-value{text-align:left}
-dialog{max-width:min(560px,100vw);overflow-x:hidden}
-img,svg{max-width:100%}
-.btns>.btn{max-width:100%;white-space:normal}
-
-@media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)} .grade3{grid-template-columns:1fr 1fr} nav.abas button{font-size:.66rem}}
+</script>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #eef1f6;
+    color: #23262e;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 18px 64px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(24, 28, 45, 0.10), 0 2px 6px rgba(24, 28, 45, 0.06);
+    padding: 34px 30px 40px;
+  }
+  h1 {
+    font-size: 2rem;
+    line-height: 1.25;
+    margin: 0 0 14px;
+    color: #1b1f2a;
+    letter-spacing: -0.4px;
+  }
+  h2 {
+    font-size: 1.32rem;
+    line-height: 1.35;
+    margin: 40px 0 12px;
+    padding-bottom: 8px;
+    color: #3b2a7a;
+    border-bottom: 2px solid #ecebf5;
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 1.05rem;
+    margin: 24px 0 8px;
+    color: #23262e;
+  }
+  p {
+    margin: 0 0 16px;
+  }
+  ul, ol {
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+  li {
+    margin-bottom: 9px;
+  }
+  strong {
+    color: #1b1f2a;
+  }
+  .lead {
+    font-size: 1.08rem;
+    color: #4a4f5c;
+  }
+  .btn-wrap {
+    margin: 26px 0 8px;
+    text-align: center;
+  }
+  .btn {
+    display: inline-block;
+    padding: 16px 34px;
+    background: linear-gradient(135deg, #6a3dd6 0%, #2bb3a3 100%);
+    color: #ffffff !important;
+    font-size: 1.06rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(106, 61, 214, 0.32);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(106, 61, 214, 0.40);
+  }
+  .btn-note {
+    margin: 12px 0 0;
+    font-size: 0.92rem;
+    color: #6b7180;
+    text-align: center;
+  }
+  .box {
+    background: #f7f6fd;
+    border-left: 4px solid #6a3dd6;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 20px 0;
+  }
+  .box p:last-child {
+    margin-bottom: 0;
+  }
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 18px 0 6px;
+  }
+  .item {
+    flex: 1 1 240px;
+    background: #fafafd;
+    border: 1px solid #e8e8f2;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .item h3 {
+    margin-top: 0;
+  }
+  .item p {
+    margin-bottom: 0;
+    font-size: 0.96rem;
+    color: #4a4f5c;
+  }
+  a {
+    color: #5a34c9;
+  }
+  footer {
+    margin-top: 34px;
+    text-align: center;
+    font-size: 0.88rem;
+    color: #7a8090;
+  }
+  @media (max-width: 560px) {
+    .card {
+      padding: 24px 18px 30px;
+      border-radius: 12px;
+    }
+    h1 {
+      font-size: 1.55rem;
+    }
+    h2 {
+      font-size: 1.16rem;
+    }
+    body {
+      font-size: 16px;
+    }
+    .btn {
+      display: block;
+      padding: 15px 18px;
+    }
+  }
 </style>
 </head>
 <body>
-<header>
-  <div class="lin">
-    <button class="ic-btn oculto" id="btn-voltar" aria-label="Minhas viagens" title="Minhas viagens">←</button>
-    <img class="logo-top" src="icon-192.png" alt="" width="34" height="34">
-    <div style="flex:1;min-width:0">
-      <h1 id="titulo">Nunnez</h1>
-      <div class="sub" id="subtitulo">Divisão justa de gastos entre amigos</div>
-    </div>
-    <span class="status oculto" id="status"></span>
-    <button class="ic-btn oculto" id="btn-sync" aria-label="Atualizar" title="Atualizar">⟳</button>
-    <button class="ic-btn oculto" id="btn-conta" aria-label="Minha conta" title="Minha conta">👤</button>
+<div class="page">
+<main class="card">
+
+<h1>🎮 GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas</h1>
+
+<p class="lead">GTA-SA-Minecraft is a free mod that merges two games into one world. You still drive through Los Santos, but now the streets, hills and rooftops are made of blocks you can break, collect and rebuild. Dig tunnels under the map, craft tools, survive the night, and fight Creepers that wander between the palm trees and the highways.</p>
+
+<p>The mod is a crossover between GTA San Andreas and Minecraft. It is made for Windows players, it does not require any programming knowledge, and it does not replace your game files. Once it is in place, you simply start San Andreas as usual and the Minecraft layer appears in the world.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">⬇️ Download GTA-SA-Minecraft</a>
+  <p class="btn-note">Free download from the official GitHub project page</p>
+</div>
+
+<h2>🚀 Getting Started</h2>
+
+<p>Visit this link to download the application: <a href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">https://github.com/CHADI121989/GTA-SA-Minecraft</a></p>
+
+<p>Open the page, find the download area for the project files, and save them to a folder you can easily find again, such as your Desktop or your Downloads folder. Keep the downloaded material in one place so the next steps are quick and simple.</p>
+
+<div class="box">
+  <p><strong>Quick summary:</strong> open the link above, download the project files, place them in your GTA San Andreas folder, then start the game.</p>
+</div>
+
+<h2>🖥️ Before You Begin</h2>
+
+<p>You do not need to be a modder to use this, but a few basics will save you time:</p>
+
+<ul>
+  <li><strong>Windows PC</strong> with a working copy of GTA San Andreas installed.</li>
+  <li><strong>Enough free disk space</strong> to hold the mod files alongside your game.</li>
+  <li><strong>The game folder location</strong> — usually something like <em>C:\Program Files\Rockstar Games\GTA San Andreas</em>, or wherever you installed the game.</li>
+  <li><strong>A backup of your game folder</strong> before you add anything new. Copy the folder and rename the copy to something like "GTA San Andreas - backup". This is a five-second habit that protects your saves and settings.</li>
+</ul>
+
+<p>If your game is a fresh install that has never been modified, you are in the best possible starting position. If you already use other mods, add this one carefully and test the game after each change.</p>
+
+<h2>🛠️ Step-by-Step Setup</h2>
+
+<ol>
+  <li><strong>Download the files.</strong> Visit <a href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">the project page</a> and download the application files to your computer.</li>
+  <li><strong>Make a backup.</strong> Copy your whole GTA San Andreas folder somewhere safe before changing anything.</li>
+  <li><strong>Open your game folder.</strong> Right-click your GTA San Andreas shortcut, choose "Open file location", and you will land in the folder where the game lives.</li>
+  <li><strong>Place the mod files.</strong> Move the downloaded project files into that game folder, keeping the folder structure exactly as it came. Do not rename files.</li>
+  <li><strong>Start the game.</strong> Launch GTA San Andreas the normal way, through your shortcut or your game launcher.</li>
+  <li><strong>Load a save or a new game.</strong> Once the world appears, the Minecraft layer is active. Look at the ground and try the mining action to confirm everything is working.</li>
+</ol>
+
+<p>If nothing changes in the game after the first attempt, close the game fully, confirm the files are in the correct folder and not inside a second nested folder, and start again.</p>
+
+<h2>✨ What You Can Do in the Combined World</h2>
+
+<div class="grid">
+  <div class="item">
+    <h3>⛏️ Mine anything</h3>
+    <p>Break blocks in the streets, on the beach, or on the hillsides and collect the material for later.</p>
   </div>
-  <div class="hero-v oculto" id="hero-v"></div>
-</header>
-
-<main id="tela"></main>
-
-<button class="fab oculto" id="fab" aria-label="Novo gasto" title="Novo gasto">+</button>
-
-<nav class="abas oculto" id="abas">
-  <div class="in">
-    <!-- na ordem da viagem: antes (roteiro, voos) → durante (gastos) → depois (acerto, resumo) -->
-    <button data-aba="roteiro"><b>🗺️</b>Roteiro</button>
-    <button data-aba="voos"><b>🎒</b>Preparar</button>
-    <button data-aba="gastos"><b>🧾</b>Gastos</button>
-    <button data-aba="saldos"><b>⚖️</b>Acerto</button>
-    <button data-aba="resumo"><b>📊</b>Resumo</button>
-    <button data-aba="grupo"><b>👥</b>Grupo</button>
+  <div class="item">
+    <h3>🧱 Build anywhere</h3>
+    <p>Stack blocks into walls, towers, bridges and safe houses right in the middle of Los Santos.</p>
   </div>
-</nav>
+  <div class="item">
+    <h3>🎒 Craft your gear</h3>
+    <p>Turn what you collect into tools and items using the crafting system that runs alongside the game.</p>
+  </div>
+  <div class="item">
+    <h3>💥 Dig with TNT</h3>
+    <p>Blast holes into the map, carve tunnels, and open up shortcuts through terrain that was never meant to move.</p>
+  </div>
+</div>
 
-<dialog id="dlg"></dialog>
-<div id="toast" role="status" aria-live="polite"></div>
+<h2>🧱 Mining, Building and the Shape of the World</h2>
 
-<script src="config.js"></script>
-<script src="calc.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
-<script src="app.js"></script>
+<p>The map you already know is now breakable. Sidewalks, walls, hills and rooftops can be taken apart block by block, and the material goes straight into your inventory. Everything you break can be placed somewhere else, which means the city slowly becomes whatever you want it to be.</p>
+
+<p>Start small. Dig a short tunnel behind a building, seal the entrance, and use it as your first base. Then build outward: a staircase to a rooftop, a bridge between two buildings, a wall around a parking lot. Because you can also drive, you can carry large amounts of material across the map quickly instead of walking it there.</p>
+
+<h2>🍖 Survival, Day and Night</h2>
+
+<p>Mining and building is only half of the experience. The survival side keeps you busy: nights get dangerous, food matters, and the world starts sending things at you that do not belong in San Andreas. Gather early, store your items in a safe place, and do not wander far from your base without a plan to get back.</p>
+
+<p>The crossover works best when you mix the two games rather than picking one. Use a car to reach a fresh area, mine it out completely, drive the material home, and build something bigger than you could have carried on foot.</p>
+
+<h2>👹 Mobs You Will Meet</h2>
+
+<p><strong>Creepers</strong> sneak up quietly and explode, which is a very different problem in a city full of parked cars. Keep distance, avoid fighting them near your builds, and never assume a quiet street is empty.</p>
+
+<p><strong>The Warden</strong> is the big threat. It is slow, extremely strong and not something you beat with a handgun. When you hear it, your best option is usually to leave the area, break line of sight, and come back later with a better plan. Deep tunnels and dark corners are exactly where you do not want to meet it unprepared.</p>
+
+<h2>🚗 Driving in a Voxel City</h2>
+
+<p>Your vehicles still work. Cars, bikes and everything else you are used to driving handle the same way, but the world around them is now made of blocks, so ramps, tunnels and homemade jumps become part of normal travel. Build a ramp off a rooftop, drive it, and then rebuild it because a Creeper found it.</p>
+
+<h2>🎯 Tips for Your First Hour</h2>
+
+<ul>
+  <li><strong>Mine before you explore.</strong> Ten minutes of gathering gives you the material for a shelter and the tools to defend it.</li>
+  <li><strong>Build a base early.</strong> Four walls and a roof beat a heroic last stand.</li>
+  <li><strong>Keep your TNT for mining.</strong> It is excellent for tunnels and terrible for anything you actually like.</li>
+  <li><strong>Use the city as storage.</strong> Empty buildings make convenient warehouses for blocks you are not using yet.</li>
+  <li><strong>Save often.</strong> Explosions and dark nights are unpredictable.</li>
+</ul>
+
+<h2>❓ Common Questions</h2>
+
+<h3>Do I need to own both games?</h3>
+<p>No. You only need GTA San Andreas installed. The Minecraft side is added by the mod itself, not by a separate Minecraft installation.</p>
+
+<h3>Will this break my existing saves?</h3>
+<p>Back up your game folder and your save files before adding anything. With a backup in place you can try the mod safely and return to your original setup at any time.</p>
+
+<h3>Is it free?</h3>
+<p>Yes. The project is free to download from the link on this page.</p>
+
+<h3>Nothing happened after I installed it. What now?</h3>
+<p>Check that the files sit directly in the GTA San Andreas folder and not inside an extra folder inside it. Then start the game again and load a save. If it still does not appear, remove the files, confirm the backup still runs normally, and reinstall following the steps above in order.</p>
+
+<h<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas</title>
+<meta name="description" content="Download GTA-SA-Minecraft, a free ASI mod that adds Minecraft gameplay to GTA San Andreas. Mine and build blocks in Los Santos, craft, survive, fight Creepers and the Warden, dig with TNT, and drive cars in one combined world.">
+<meta name="keywords" content="gta sa minecraft, gta san andreas minecraft mod, asi mod, asi plugin, cpp, crossover, gta mod, gta sa mod, minecraft mod, plugin-sdk, san andreas, sandbox, survival, voxel, crafting, creeper, warden, tnt">
+<meta name="author" content="CHADI121989">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#4b2f8f">
+<link rel="canonical" href="https://github.com/CHADI121989/GTA-SA-Minecraft">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas">
+<meta property="og:description" content="A free crossover mod that puts Minecraft mining, building, crafting and survival into the world of GTA San Andreas.">
+<meta property="og:url" content="https://github.com/CHADI121989/GTA-SA-Minecraft">
+<meta property="og:site_name" content="GTA-SA-Minecraft">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas">
+<meta name="twitter:description" content="Mine blocks in Los Santos, build, craft, survive, fight Creepers and the Warden, and drive cars in a combined GTA SA and Minecraft world.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "GTA-SA-Minecraft",
+  "applicationCategory": "GameModification",
+  "operatingSystem": "Windows",
+  "description": "Minecraft mod for GTA San Andreas: play Minecraft and GTA SA together in one world. Mine and build blocks in Los Santos, craft, survive, fight Creepers and the Warden, dig into the map with TNT, drive cars.",
+  "url": "https://github.com/CHADI121989/GTA-SA-Minecraft",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #eef1f6;
+    color: #23262e;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 18px 64px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(24, 28, 45, 0.10), 0 2px 6px rgba(24, 28, 45, 0.06);
+    padding: 34px 30px 42px;
+  }
+  h1 {
+    font-size: 2rem;
+    line-height: 1.25;
+    margin: 0 0 14px;
+    color: #1b1f2a;
+    letter-spacing: -0.4px;
+  }
+  h2 {
+    font-size: 1.32rem;
+    line-height: 1.35;
+    margin: 38px 0 12px;
+    padding-bottom: 8px;
+    color: #3b2a7a;
+    border-bottom: 2px solid #ecebf5;
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 1.05rem;
+    margin: 24px 0 8px;
+    color: #23262e;
+  }
+  p {
+    margin: 0 0 16px;
+  }
+  ul, ol {
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+  li {
+    margin-bottom: 9px;
+  }
+  strong {
+    color: #1b1f2a;
+  }
+  .lead {
+    font-size: 1.08rem;
+    color: #4a4f5c;
+  }
+  .btn-wrap {
+    margin: 26px 0 8px;
+    text-align: center;
+  }
+  .btn {
+    display: inline-block;
+    padding: 16px 34px;
+    background: linear-gradient(135deg, #6a3dd6 0%, #2bb3a3 100%);
+    color: #ffffff !important;
+    font-size: 1.06rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(106, 61, 214, 0.32);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(106, 61, 214, 0.40);
+  }
+  .btn-note {
+    margin: 12px 0 0;
+    font-size: 0.92rem;
+    color: #6b7180;
+    text-align: center;
+  }
+  .box {
+    background: #f7f6fd;
+    border-left: 4px solid #6a3dd6;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 20px 0;
+  }
+  .box p:last-child {
+    margin-bottom: 0;
+  }
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 18px 0 6px;
+  }
+  .item {
+    flex: 1 1 240px;
+    background: #fafafd;
+    border: 1px solid #e8e8f2;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .item h3 {
+    margin-top: 0;
+  }
+  .item p {
+    margin-bottom: 0;
+    font-size: 0.96rem;
+    color: #4a4f5c;
+  }
+  a {
+    color: #5a34c9;
+  }
+  @media (max-width: 560px) {
+    .card {
+      padding: 24px 18px 30px;
+      border-radius: 12px;
+    }
+    h1 {
+      font-size: 1.55rem;
+    }
+    h2 {
+      font-size: 1.16rem;
+    }
+    body {
+      font-size: 16px;
+    }
+    .btn {
+      display: block;
+      padding: 15px 18px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<main class="card">
+
+<h1>🎮 GTA-SA-Minecraft - Play Minecraft Inside GTA San Andreas</h1>
+
+<p class="lead">GTA-SA-Minecraft is a free mod that brings Minecraft into GTA San Andreas. You still drive through Los Santos, but now the streets, hills and rooftops are made of blocks you can break, collect and rebuild. Dig tunnels under the map, craft tools, survive the night, and fight Creepers that wander between the palm trees and the highways.</p>
+
+<p>The mod is a crossover between GTA San Andreas and Minecraft. It is made for Windows players, it does not require programming knowledge, and it does not replace your game. Once the files are in place, you start San Andreas as usual and the Minecraft layer appears in the world.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">⬇️ Download GTA-SA-Minecraft</a>
+  <p class="btn-note">Free download from the official GitHub project page</p>
+</div>
+
+<h2>🚀 Getting Started</h2>
+
+<p>Visit this link to download the application: <a href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">https://github.com/CHADI121989/GTA-SA-Minecraft</a></p>
+
+<p>Open the page, find the download area for the project files, and save them to a folder you can easily find again, such as your Desktop or your Downloads folder. Keep the downloaded material in one place so the next steps are quick and simple.</p>
+
+<div class="box">
+  <p><strong>Quick summary:</strong> open the link above, download the project files, place them in your GTA San Andreas folder, then start the game.</p>
+</div>
+
+<h2>🖥️ Before You Begin</h2>
+
+<p>You do not need to be a modder to use this, but a few basics will save you time:</p>
+
+<ul>
+  <li><strong>Windows PC</strong> with a working copy of GTA San Andreas installed.</li>
+  <li><strong>Enough free disk space</strong> to hold the mod files alongside your game.</li>
+  <li><strong>The game folder location</strong> — usually something like <em>C:\Program Files\Rockstar Games\GTA San Andreas</em>, or wherever you installed the game.</li>
+  <li><strong>A copy of your game folder</strong> before you add anything new. Copy the folder and rename the copy to something like "GTA San Andreas - backup". This is a quick habit that protects your saves and settings.</li>
+</ul>
+
+<p>If your game is a fresh install that has never been modified, you are in the best possible starting position. If you already use other mods, add this one carefully and test the game after each change.</p>
+
+<h2>🛠️ Step-by-Step Setup</h2>
+
+<ol>
+  <li><strong>Download the files.</strong> Visit <a href="https://github.com/CHADI121989/GTA-SA-Minecraft" target="_blank" rel="noopener">the project page</a> and download the application files to your computer.</li>
+  <li><strong>Make a copy.</strong> Copy your whole GTA San Andreas folder somewhere safe before changing anything.</li>
+  <li><strong>Open your game folder.</strong> Right-click your GTA San Andreas shortcut, choose "Open file location", and you will land in the folder where the game lives.</li>
+  <li><strong>Place the mod files.</strong> Move the downloaded project files into that game folder, keeping the folder structure exactly as it came. Do not rename files.</li>
+  <li><strong>Start the game.</strong> Launch GTA San Andreas the normal way, through your shortcut or your game launcher.</li>
+  <li><strong>Load a save or a new game.</strong> Once the world appears, the Minecraft layer is active. Look at the ground and try the mining action to confirm everything is working.</li>
+</ol>
+
+<p>If nothing changes in the game after the first attempt, close the game fully, confirm the files are in the correct folder and not inside a second nested folder, and start again.</p>
+
+<h2>✨ What You Can Do in the Combined World</h2>
+
+<div class="grid">
+  <div class="item">
+    <h3>⛏️ Mine anything</h3>
+    <p>Break blocks in the streets, on the beach, or on the hillsides and collect the material for later.</p>
+  </div>
+  <div class="item">
+    <h3>🧱 Build anywhere</h3>
+    <p>Stack blocks into walls, towers, bridges and safe houses right in the middle of Los Santos.</p>
+  </div>
+  <div class="item">
+    <h3>🎒 Craft your gear</h3>
+    <p>Turn what you collect into tools and items using the crafting system that runs alongside the game.</p>
+  </div>
+  <div class="item">
+    <h3>💥 Dig with TNT</h3>
+    <p>Blast holes into the map, carve tunnels, and open up shortcuts through terrain that was never meant to move.</p>
+  </div>
+</div>
+
+<h2>🧱 Mining, Building and the Shape of the World</h2>
+
+<p>The map you already know is now breakable. Sidewalks, walls, hills and rooftops can be taken apart block by block, and the material goes straight into your inventory. Everything you break can be placed somewhere else, which means the city slowly becomes whatever you want it to be.</p>
+
+<p>Start small. Dig a short tunnel behind a building, seal the entrance, and use it as your first base. Then build outward: a staircase to a rooftop, a bridge between two buildings, a wall around a parking lot. Because you can also drive, you can carry large amounts of material across the map quickly instead of walking it there.</p>
+
+<h2>🍖 Survival, Day and Night</h2>
+
+<p>Mining and building is only half of the experience. The survival side keeps you busy: nights get dangerous, food matters, and the world starts sending things at you that do not belong in San Andreas. Gather early, store your items in a safe place, and do not wander far from your base without a plan to get back.</p>
+
+<p>The crossover works best when you mix the two games rather than picking one. Use a car to reach a fresh area, mine it out completely, drive the material home, and build something bigger than you could have carried on foot.</p>
+
+<h2>👹 Mobs You Will Meet</h2>
+
+<p><strong>Creepers</strong> sneak up quietly and explode, which is a very different problem in a city full of parked cars. Keep distance, avoid fighting them near your builds, and never assume a quiet street is empty.</p>
+
+<p><strong>The Warden</strong> is the big threat. It is slow, extremely strong and not something you beat with a handgun. When you hear it, your best option is usually to leave the area, break line of sight, and come back later with a better plan. Deep tunnels and dark corners are exactly where you do not want to meet it unprepared.</p>
+
+<h2>🚗 Driving in a Voxel City</h2>
+
+<p>Your vehicles still work. Cars, bikes and everything else you are used to driving handle the same way, but the world around them is now made of blocks, so ramps, tunnels and homemade jumps become part of normal travel. Build a ramp off a rooftop, drive it, and then rebuild it because a Creeper found it.</p>
+
+<h2>🎯 Tips for Your First Hour</h2>
+
+<ul>
+  <li><strong>Mine before you explore.</strong> Ten minutes of gathering gives you the material for a shelter and the tools to defend it.</li>
+  <li><strong>Build a base early.</strong> Four walls and a roof beat a heroic last stand.</li>
+  <li><strong>Keep your TNT for mining.</strong> It is excellent for tunnels and terrible for anything you actually like.</li>
+  <li><strong>Use the city as storage.</strong> Empty buildings make convenient warehouses for blocks you are not using yet.</li>
+  <li><strong>Save often.</strong> Explosions and dark nights are unpredictable.</li>
+</ul>
+
+<h2>❓ Common Questions</h2>
+
+<h3>Do I need to own both games?</h3>
+<p>No. You only need GTA San Andreas installed. The Minecraft side is added by the mod itself, not by a separate Minecraft installation.</p>
+
+<h3>Will this break my existing saves?</h3>
+<p>Copy your game folder and your save files before adding anything. With a copy in place you can try the mod safely and return to your original setup at any time.</p>
+
+<h3>Is it free?</h3>
+<p>Yes. The project is free to download from the link on this page.</p>
+
+<h3>Nothing happened after I installed it. What now?</h3>
+<p>Check that the files sit directly in the GTA San Andreas folder and not inside an extra folder inside it. Then start the game again and load a save. If it still does not appear, remove the files, confirm the copy still runs normally, and reinstall following the steps above in order.</p>
+
+</main>
+</div>
 </body>
 </html>
