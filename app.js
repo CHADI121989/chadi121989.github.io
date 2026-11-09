@@ -153,6 +153,18 @@ function recebeu(j) {
 }
 function nome(id) { const p = pessoa(id); return p ? p.nome : '(removido)'; }
 function primeiroNome(id) { return nome(id).split(' ')[0]; }
+// Bolinha com a inicial da pessoa, sempre na mesma cor para a mesma pessoa.
+const CORES_AV = ['#f7931e', '#2ad4b4', '#3aa0f0', '#ef6b9a', '#9b7bf2', '#f2b632', '#45c27a'];
+function corDe(id) { let h = 0; for (const ch of String(id || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return CORES_AV[h % CORES_AV.length]; }
+function avatar(id, cls = 'av') { return `<span class="${cls}" style="--av:${corDe(id)}" title="${esc(nome(id))}">${esc(nome(id).trim().charAt(0).toUpperCase() || '?')}</span>`; }
+// "faltam 11 dias" antes, "dia 2 de 5" durante, "encerrada" depois.
+function contagem(v) {
+  const h = hoje(), dif = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 864e5);
+  if (!v.inicio) return '';
+  if (h < v.inicio) { const n = dif(h, v.inicio); return n === 1 ? '⏳ é amanhã!' : `⏳ faltam ${n} dias`; }
+  if (!v.fim || h <= v.fim) return `🌴 dia ${dif(v.inicio, h) + 1}${v.fim ? ' de ' + (dif(v.inicio, v.fim) + 1) : ''}`;
+  return '✅ viagem encerrada';
+}
 
 function op(o) {
   // A senha inicial vai só para a planilha; não fica nos dados guardados no aparelho.
@@ -315,7 +327,7 @@ function telaConta(modo, etapa) {
       <p style="text-align:center;margin:16px 0 0;font-size:.9rem"><a href="#" data-reenviar="1">Mandar o código de novo</a></p>`;
   }
   $('#tela').innerHTML = `<div class="login-wrap">
-    <img class="login-logo" src="logo.jpg" alt="${esc(NOME)} — ${esc(SLOGAN)}">
+    <img class="login-logo" src="logo-transparente.png" alt="${esc(NOME)} — ${esc(SLOGAN)}">
     <h1 class="login-titulo">${titulo}</h1>
     <p class="login-sub">${sub}</p>
     ${pend ? '<div class="login-aviso">🧳 Você recebeu um convite para uma viagem. Entre ou crie sua conta para participar.</div>' : ''}
@@ -386,7 +398,7 @@ function telaLogin() {
       <label class="cp"><span>Repita a senha</span><input type="password" name="senha2" autocomplete="new-password" minlength="4" required></label>`;
   const campoEmail = `<label class="cp"><span>Seu e-mail (para avisos do roteiro e das passagens)</span><input type="email" name="email" autocomplete="email"></label>`;
   $('#tela').innerHTML = `
-  <div class="heroi" style="padding-top:12px"><img src="logo.jpg" alt="${esc(NOME)}" style="width:min(150px,40vw)"></div>
+  <div class="heroi-escuro"><img src="logo-transparente.png" alt="${esc(NOME)}"></div>
   <div class="cartao">
     <h2>Entrar em ${esc(L.viagem || 'viagem')}</h2>
     ${L.msg ? `<div class="aviso">${esc(L.msg)}</div>` : ''}
@@ -483,13 +495,15 @@ function render() {
     return telaLogin();
   }
   const emViagem = !!(S && S.dados);
+  document.body.classList.toggle('em-viagem', emViagem);
+  $('#hero-v').classList.toggle('oculto', !emViagem);
   $('#abas').classList.toggle('oculto', !emViagem);
   $('#fab').classList.toggle('oculto', !emViagem || !['gastos', 'resumo'].includes(ABA));
   $('#btn-voltar').classList.toggle('oculto', !emViagem);
   $('#btn-sync').classList.toggle('oculto', !emViagem);
   $('#btn-conta').classList.toggle('oculto', !emViagem);
   $('.logo-top').classList.toggle('oculto', emViagem); // dentro da viagem, o espaço vai para o nome dela
-  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; }
+  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; $('#btn-conta').style.background = eu ? corDe(eu.id) : ''; }
   status();
   if (!emViagem) {
     $('#titulo').textContent = NOME;
@@ -500,7 +514,12 @@ function render() {
   const v = S.dados.viagem;
   $('#titulo').textContent = v.nome;
   const eu = pessoa(S.eu);
-  $('#subtitulo').textContent = [v.inicio && v.fim ? `${fmtData(v.inicio)} a ${fmtData(v.fim)}` : '', eu ? 'você: ' + eu.nome : ''].filter(Boolean).join(' · ') || `${S.dados.pessoas.length} pessoas`;
+  const np = S.dados.pessoas.length;
+  $('#subtitulo').textContent = [v.inicio && v.fim ? `${fmtData(v.inicio)} a ${fmtData(v.fim)}` : '', np + (np === 1 ? ' pessoa' : ' pessoas')].filter(Boolean).join(' · ');
+  const cont = contagem(v), MAX_AV = 5;
+  $('#hero-v').innerHTML = `<div class="hv-chips">${v.destino ? `<span class="hv-chip">📍 ${esc(v.destino)}</span>` : ''}${cont ? `<span class="hv-chip">${cont}</span>` : ''}</div>
+    <button class="hv-avs" id="hv-grupo" aria-label="Ver o grupo">${S.dados.pessoas.slice(0, MAX_AV).map(p => avatar(p.id)).join('')}${np > MAX_AV ? `<span class="av mais">+${np - MAX_AV}</span>` : ''}</button>`;
+  $('#hv-grupo').onclick = () => { ABA = 'grupo'; ls.set('rv:aba', ABA); render(); scrollTo(0, 0); };
   document.title = v.nome + ' · ' + NOME;
   $$('#abas button').forEach(b => b.setAttribute('aria-current', b.dataset.aba === ABA ? 'page' : 'false'));
   ({ gastos: telaGastos, saldos: telaAcerto, voos: telaVoos, roteiro: telaRoteiro, plano: telaRoteiro, resumo: telaResumo, grupo: telaGrupo }[ABA] || telaGastos)();
@@ -527,8 +546,8 @@ function telaInicio() {
   const fmtPeriodo = x => x.inicio ? fmtData(x.inicio) + (x.fim ? ' a ' + fmtData(x.fim) : '') : 'sem data';
   $('#titulo').textContent = NOME; $('#subtitulo').textContent = CONTA ? 'Olá, ' + CONTA.nome.split(' ')[0] + '!' : SLOGAN;
   $('#tela').innerHTML = `
-  <div class="heroi" style="padding-top:12px">
-    <img src="logo.jpg" alt="${esc(NOME)} — ${esc(SLOGAN)}" style="width:min(150px,40vw)" onerror="this.outerHTML='<div class=&quot;logo&quot;>🧳</div><h1>${esc(NOME)}</h1>'">
+  <div class="heroi-escuro">
+    <img src="logo-transparente.png" alt="${esc(NOME)} — ${esc(SLOGAN)}" onerror="this.outerHTML='<div class=&quot;logo&quot;>🧳</div><h1>${esc(NOME)}</h1>'">
   </div>
   ${DEMO ? '<div class="aviso">Modo demonstração: os dados ficam só neste aparelho. Para dividir com os amigos, ligue a planilha (veja o LEIA-ME).</div>' : ''}
   <div class="btns" style="margin-bottom:14px">
@@ -922,7 +941,7 @@ function telaVoos() {
   ps.forEach(p => {
     const linha = tr => { const s = sitDe(p.id, tr); return `${SIT[s].i} ${TRECHOS[tr]}`; };
     const pend = Object.keys(TRECHOS).filter(tr => sitDe(p.id, tr) === 'comprada');
-    html += `<li class="${passagemDe(p.id, 'ida') || passagemDe(p.id, 'volta') ? 'clica' : ''}" data-ver="${esc(p.id)}"><span class="ico">${p.id === S.eu ? '🙋' : '👤'}</span>
+    html += `<li class="${passagemDe(p.id, 'ida') || passagemDe(p.id, 'volta') ? 'clica' : ''}" data-ver="${esc(p.id)}">${avatar(p.id, 'ico av')}
       <span class="meio"><b>${esc(p.nome)}</b><small>${linha('ida')} · ${linha('volta')}${p.origem ? ' · sai de ' + esc(p.origem) : ''}</small></span>
       ${org && pend.length ? `<button class="btn mini pri" data-confirmar="${esc(p.id)}">Confirmar</button>` : ''}</li>`;
   });
@@ -1175,7 +1194,7 @@ function exportarAgenda() {
 function htmlEnquetes() {
   const org = souOrg(), es = (S.dados.enquetes || []).slice().sort((a, b) => (a.status === 'encerrada') - (b.status === 'encerrada') || String(b.id).localeCompare(String(a.id)));
   if (!es.length && !org) return '';
-  let h = `<div class="titulo-sec" style="display:flex;justify-content:space-between;align-items:center"><span>🗳️ Enquetes</span>${org ? '<button class="btn mini" id="nova-enq">+ Enquete</button>' : ''}</div>`;
+  let h = `<div class="titulo-sec"><span style="flex:1">🗳️ Enquetes</span>${org ? '<button class="btn mini" id="nova-enq" style="letter-spacing:0">+ Enquete</button>' : ''}</div>`;
   if (!es.length) return h + '<p class="dica" style="margin:0 4px 10px">Em dúvida entre dois passeios ou datas? Crie uma enquete e o grupo vota.</p>';
   es.forEach(e => {
     const votos = e.votos || {}, total = Object.keys(votos).length, meu = votos[S.eu], fechada = e.status === 'encerrada';
@@ -1658,7 +1677,7 @@ function telaGrupo() {
     const acesso = leg ? '' : p.papel === 'organizador' ? '👑 organizador' : !p.temSenha ? '🔒 sem senha ainda' : p.trocarSenha ? 'ainda não criou a senha dele' : '';
     const extra = [org ? acesso : (p.papel === 'organizador' ? '👑 organizador' : ''), p.chegada || p.saida ? `${p.chegada ? 'chega ' + fmtData(p.chegada) : ''}${p.chegada && p.saida ? ', ' : ''}${p.saida ? 'sai ' + fmtData(p.saida) : ''}` : '', Number(p.peso) && Number(p.peso) !== 1 ? `conta como ${fmtNum(p.peso)}` : '', ...(p.restricoes || []).map(r => (C.RESTRICOES[r] || r).split(' ').slice(1).join(' ').toLowerCase()), p.pix ? 'Pix ✓' : 'sem Pix'].filter(Boolean).join(' · ');
     const pode = org || p.id === S.eu;
-    return `<li class="${pode ? 'clica' : ''}" data-p="${esc(p.id)}"><span class="ico">${p.id === S.eu ? '🙋' : '👤'}</span><span class="meio"><b>${esc(p.nome)}${p.id === S.eu ? ' (você)' : ''}</b><small>${esc(extra)}</small></span>${pode ? '<span class="mut">›</span>' : ''}</li>`;
+    return `<li class="${pode ? 'clica' : ''}" data-p="${esc(p.id)}">${avatar(p.id, 'ico av')}<span class="meio"><b>${esc(p.nome)}${p.id === S.eu ? ' (você)' : ''}</b><small>${esc(extra)}</small></span>${pode ? '<span class="mut">›</span>' : ''}</li>`;
   }).join('')}</ul>${org ? '<button class="btn lg sua" id="add-p" style="margin:6px 0 12px">+ Adicionar pessoa</button>' : '<p class="dica" style="margin:6px 0 12px">Só o organizador cadastra pessoas. Toque no seu nome para editar seus dados.</p>'}</div>
   ${org || (S.dados.carros || []).length ? `<div class="titulo-sec">Carros (${(S.dados.carros || []).length})</div>
   <div class="cartao" style="padding:4px 16px">
@@ -1707,7 +1726,7 @@ function quandoFoi(iso) {
 function janelaHistorico() {
   const h = S.dados.historico || [];
   janela('🕓 Histórico de alterações', h.length ? `<p class="mut peq" style="margin-top:0">Tudo o que foi lançado, mudado ou apagado na viagem (mais recente primeiro).</p>
-    <ul class="lista">${h.map(x => `<li><span class="ico" style="width:34px;height:34px;font-size:.9rem;font-weight:800">${esc(nome(x.pessoa).charAt(0))}</span><span class="meio"><b style="white-space:normal">${esc(nome(x.pessoa))}</b><small style="white-space:normal">${esc(x.texto)}</small></span><span class="mut peq" style="white-space:nowrap">${quandoFoi(x.quando)}</span></li>`).join('')}</ul>`
+    <ul class="lista">${h.map(x => `<li>${avatar(x.pessoa, 'ico av pq')}<span class="meio"><b style="white-space:normal">${esc(nome(x.pessoa))}</b><small style="white-space:normal">${esc(x.texto)}</small></span><span class="mut peq" style="white-space:nowrap">${quandoFoi(x.quando)}</span></li>`).join('')}</ul>`
     : '<div class="vazio"><b>🕓</b>Nada registrado ainda.</div>');
 }
 
