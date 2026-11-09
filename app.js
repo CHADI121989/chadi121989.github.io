@@ -2416,7 +2416,17 @@ window.addEventListener('hashchange', () => { const h = lerHash(); if (h && (!S 
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S && S.dados) atualizar(true); });
 setInterval(() => { if (document.visibilityState === 'visible' && S && S.dados && !S.enviando) atualizar(true); }, 60000);
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  // Versão nova publicada: o app recarrega sozinho uma vez (só se já havia uma versão antiga rodando e nenhuma janela aberta).
+  const tinhaVersao = !!navigator.serviceWorker.controller;
+  let recarregou = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!tinhaVersao || recarregou) return;
+    recarregou = true;
+    if (!(dlg && dlg.open)) location.reload(); else toast('Versão nova do app pronta: feche e abra para atualizar.');
+  });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+}
 
 (function iniciar() {
   const h = lerHash();
