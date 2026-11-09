@@ -172,7 +172,7 @@ body.modo-login header{display:none}
 body.modo-login main{max-width:none;padding:0}
 .login-wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px calc(32px + env(safe-area-inset-bottom));
   background:radial-gradient(60% 40% at 15% 10%,rgba(247,147,30,.18),transparent 70%),radial-gradient(55% 45% at 90% 20%,rgba(58,160,240,.18),transparent 70%),radial-gradient(60% 50% at 50% 100%,rgba(42,212,180,.16),transparent 70%),var(--marinho)}
-.login-logo{width:132px;height:132px;border-radius:30px;object-fit:cover;box-shadow:0 12px 40px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08)}
+.login-logo{width:min(180px,48vw);height:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
 .login-titulo{color:var(--creme);font-size:1.45rem;font-weight:800;margin:18px 0 2px;text-align:center}
 .login-sub{color:#9ba4c8;font-size:.92rem;margin:0 0 22px;text-align:center}
 .login-card{width:100%;max-width:400px;background:rgba(20,29,68,.92);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);color:var(--creme);backdrop-filter:blur(6px)}
@@ -194,7 +194,62 @@ dialog #toast{bottom:calc(96px + env(safe-area-inset-bottom))}
 #toast.on{opacity:1}
 .aviso{background:var(--ali-bg);color:var(--ali);border-radius:12px;padding:10px 12px;font-size:.86rem;margin-bottom:12px}
 
-@media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)} .grade3{grid-template-columns:1fr 1fr}}
+/* ===== Visual novo (mesmo clima da tela de login) ===== */
+:root{--r:18px;--brilho:radial-gradient(70% 90% at 0% 0%,rgba(247,147,30,.26),transparent 60%),radial-gradient(60% 90% at 100% 0%,rgba(58,160,240,.30),transparent 60%),radial-gradient(80% 80% at 50% 130%,rgba(42,212,180,.26),transparent 60%),var(--marinho)}
+:root:not([data-theme="dark"]){--bg:#f2f4fa;--lin:#e4e7f1;--sombra:0 1px 2px rgba(16,26,60,.04),0 8px 24px rgba(16,26,60,.07)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b1230;--lin:#232e5a;--sombra:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{--bg:#0b1230;--lin:#232e5a;--sombra:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}
+
+/* Topo dentro da viagem: marinho com os brilhos da marca, nome grande, destino, contagem e o grupo */
+body.em-viagem header{position:relative;border:0;border-image:none;border-radius:0 0 26px 26px;padding-bottom:18px;background:var(--brilho);box-shadow:0 10px 30px rgba(16,26,60,.18)}
+body.em-viagem header h1{font-size:1.4rem;font-weight:800;letter-spacing:-.01em}
+body.em-viagem header .sub{opacity:.75;margin-top:2px}
+body.em-viagem main{padding-top:18px}
+.hero-v{max-width:760px;margin:14px auto 0;display:flex;align-items:center;gap:10px}
+.hv-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.hv-chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:5px 11px;font-size:.8rem;font-weight:600;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.hv-avs{display:flex;align-items:center;padding:0 0 0 8px;border:0;background:transparent;cursor:pointer;flex:none}
+.av{width:32px;height:32px;border-radius:50%;background:var(--av,var(--agua));color:#0b1433;font-weight:800;font-size:.85rem;display:inline-grid;place-items:center;flex:none}
+.hv-avs .av{margin-left:-9px;border:2px solid var(--marinho);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.hv-avs .av.mais{background:rgba(255,255,255,.2);color:var(--creme);font-size:.75rem}
+.lista .ico.av{border-radius:50%;background:var(--av);color:#0b1433;font-size:1.05rem;font-weight:800}
+.lista .ico.av.pq{width:34px;height:34px;font-size:.9rem}
+
+/* Cartões, listas e botões mais leves e arredondados */
+.cartao{border-color:transparent;padding:18px}
+:root[data-theme="dark"] .cartao{border-color:var(--lin)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cartao{border-color:var(--lin)}}
+.cartao h2{font-size:1.06rem;font-weight:800}
+.titulo-sec{display:flex;align-items:center;gap:8px;color:var(--mut);font-weight:800;letter-spacing:.07em;font-size:.76rem;margin:22px 4px 10px}
+.titulo-sec::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--marca);flex:none}
+.lista .ico{border-radius:14px;background:linear-gradient(135deg,rgba(247,147,30,.14),rgba(42,212,180,.14) 55%,rgba(58,160,240,.16))}
+.lista li{padding:12px 0}
+.btn{border-radius:14px;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,#2ad4b4,#25bcd8);border-color:transparent;box-shadow:0 4px 14px rgba(42,212,180,.28)}
+.btn.mini{border-radius:99px;padding:6px 12px}
+.chip{padding:7px 13px;font-weight:600}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,#2ad4b4,#25bcd8);border-color:transparent}
+.destaque{box-shadow:0 10px 28px rgba(42,212,180,.25)!important;border-radius:22px!important}
+.placar .cartao{padding:14px 16px}
+.placar strong{font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+.dia{color:var(--tx);opacity:.65;text-transform:capitalize}
+
+/* Barra de abas flutuante; a aba atual ganha um destaque com as cores da marca */
+body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+nav.abas{left:0;right:0;margin:0 auto;width:calc(100% - 20px);max-width:740px;bottom:calc(10px + env(safe-area-inset-bottom));padding:4px;border:1px solid var(--lin);border-radius:24px;background:var(--card);box-shadow:0 10px 30px rgba(16,26,60,.18)}
+@supports (backdrop-filter:blur(1px)){nav.abas{background:color-mix(in srgb,var(--card) 86%,transparent);backdrop-filter:blur(14px)}}
+nav.abas button{min-height:56px;border-radius:18px;font-weight:600;padding:6px 1px 7px}
+nav.abas button b{width:46px;height:28px;margin:0 auto 1px;border-radius:14px;display:grid;place-items:center;font-size:1.15rem;transition:background .2s}
+nav.abas button[aria-current="page"]{color:var(--tx);font-weight:800}
+nav.abas button[aria-current="page"] b{background:linear-gradient(135deg,rgba(247,147,30,.25),rgba(42,212,180,.28) 55%,rgba(58,160,240,.3))}
+.fab{bottom:calc(88px + env(safe-area-inset-bottom));border-radius:50%;width:60px;height:60px;box-shadow:0 10px 24px rgba(42,212,180,.35),0 4px 10px rgba(247,147,30,.25)}
+
+/* Logo sem fundo sobre um cartão marinho (tela inicial e entrada pela viagem) */
+.heroi-escuro{background:var(--brilho);border-radius:24px;padding:22px 16px 18px;margin:4px 0 16px;display:grid;place-items:center;box-shadow:0 10px 30px rgba(16,26,60,.18)}
+.heroi-escuro img{width:min(170px,45vw);height:auto;display:block}
+
+@media (max-width:380px){.cats{grid-template-columns:repeat(3,1fr)} .grade3{grid-template-columns:1fr 1fr} nav.abas button{font-size:.66rem}}
 </style>
 </head>
 <body>
@@ -210,6 +265,7 @@ dialog #toast{bottom:calc(96px + env(safe-area-inset-bottom))}
     <button class="ic-btn oculto" id="btn-sync" aria-label="Atualizar" title="Atualizar">⟳</button>
     <button class="ic-btn oculto" id="btn-conta" aria-label="Minha conta" title="Minha conta">👤</button>
   </div>
+  <div class="hero-v oculto" id="hero-v"></div>
 </header>
 
 <main id="tela"></main>
