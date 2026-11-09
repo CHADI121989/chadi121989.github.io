@@ -283,42 +283,55 @@ function telaConta(modo, etapa) {
   modo = modo || 'entrar';
   $('#titulo').textContent = NOME; $('#subtitulo').textContent = SLOGAN;
   const pend = ls.get('rv:pendente', null);
-  const aba = (m, r) => `<button class="chip" data-modo="${m}" aria-pressed="${modo === m}">${r}</button>`;
-  let corpo = '';
-  if (modo === 'entrar') corpo = `
-    <label class="cp"><span>E-mail</span><input type="email" name="email" required autocomplete="email" value="${esc(ls.get('rv:email', ''))}"></label>
-    <label class="cp"><span>Senha</span><input type="password" name="senha" required autocomplete="current-password"></label>
-    <button class="btn pri lg">Entrar</button>
-    <p class="dica" style="text-align:center;margin:12px 0 0"><a href="#" data-modo="senha">Esqueci a senha</a></p>`;
-  else if (modo === 'criar' && !etapa) corpo = `
-    <label class="cp"><span>Seu nome</span><input type="text" name="nome" required autocomplete="name"></label>
-    <label class="cp"><span>E-mail</span><input type="email" name="email" required autocomplete="email"></label>
-    <label class="cp"><span>Crie uma senha (mín. 6)</span><input type="password" name="senha" minlength="6" required autocomplete="new-password"></label>
-    <label class="cp"><span>Repita a senha</span><input type="password" name="senha2" minlength="6" required autocomplete="new-password"></label>
-    <button class="btn pri lg">Continuar</button>
-    <p class="dica" style="margin:10px 0 0">Vamos mandar um código de 6 números para o seu e-mail, para confirmar que ele é seu.</p>`;
-  else if (modo === 'senha' && !etapa) corpo = `
-    <label class="cp"><span>E-mail da conta</span><input type="email" name="email" required autocomplete="email"></label>
-    <button class="btn pri lg">Mandar código</button>`;
-  else corpo = `
-    <p class="mut" style="margin-top:0">Mandamos um código de 6 números para <b>${esc(etapa.email)}</b> (confira também o spam).</p>
-    <label class="cp"><span>Código</span><input type="text" name="codigo" inputmode="numeric" maxlength="6" required autocomplete="one-time-code" style="font-size:1.4rem;letter-spacing:6px;text-align:center"></label>
-    ${modo === 'senha' ? '<label class="cp"><span>Nova senha (mín. 6)</span><input type="password" name="senha" minlength="6" required autocomplete="new-password"></label>' : ''}
-    <button class="btn pri lg">${modo === 'senha' ? 'Salvar nova senha' : 'Criar conta'}</button>
-    <p class="dica" style="text-align:center;margin:12px 0 0"><a href="#" data-reenviar="1">Mandar o código de novo</a></p>`;
-  $('#tela').innerHTML = `
-  <div class="heroi" style="padding-top:14px"><img src="logo.jpg" alt="${esc(NOME)}" style="width:min(170px,45vw)"></div>
-  ${pend ? '<div class="aviso" style="background:var(--suave);color:var(--tx)">🧳 Você recebeu um convite para uma viagem. Entre ou crie sua conta para participar.</div>' : ''}
-  <div class="cartao">
-    <div class="chips" style="margin-bottom:14px">${aba('entrar', 'Entrar')}${aba('criar', 'Criar conta')}</div>
-    <form id="f-conta">${corpo}</form>
+  document.body.classList.add('modo-login');
+  const aba = (m, r) => `<button type="button" data-modo="${m}" aria-pressed="${modo === m || (m === 'entrar' && modo === 'senha')}">${r}</button>`;
+  const campo = (ic, rot, attrs, olho) => `<label class="cp"><span>${rot}</span><span class="campo-ic"><i>${ic}</i><input ${attrs}>${olho ? '<button type="button" class="olho" aria-label="Mostrar senha">👁</button>' : ''}</span></label>`;
+  let corpo = '', titulo = '', sub = '';
+  if (modo === 'entrar') {
+    titulo = 'Bem-vindo de volta'; sub = 'Entre para ver suas viagens';
+    corpo = campo('✉️', 'E-mail', `type="email" name="email" required autocomplete="email" placeholder="seu@email.com" value="${esc(ls.get('rv:email', ''))}"`) +
+      campo('🔒', 'Senha', 'type="password" name="senha" required autocomplete="current-password" placeholder="Sua senha"', true) +
+      `<button class="btn-marca" style="margin-top:6px">Entrar</button>
+      <p style="text-align:center;margin:16px 0 0;font-size:.9rem"><a href="#" data-modo="senha">Esqueci a senha</a></p>`;
+  } else if (modo === 'criar' && !etapa) {
+    titulo = 'Crie sua conta'; sub = 'Um login só para todas as suas viagens';
+    corpo = campo('👤', 'Seu nome', 'type="text" name="nome" required autocomplete="name" placeholder="Como os amigos te chamam"') +
+      campo('✉️', 'E-mail', 'type="email" name="email" required autocomplete="email" placeholder="seu@email.com"') +
+      campo('🔒', 'Senha', 'type="password" name="senha" minlength="6" required autocomplete="new-password" placeholder="Mínimo 6 caracteres"', true) +
+      campo('🔒', 'Repita a senha', 'type="password" name="senha2" minlength="6" required autocomplete="new-password" placeholder="Igual à de cima"', true) +
+      `<button class="btn-marca" style="margin-top:6px">Continuar</button>
+      <p style="color:#9ba4c8;font-size:.82rem;margin:12px 0 0;text-align:center">Vamos mandar um código de 6 números para o seu e-mail, para confirmar que ele é seu.</p>`;
+  } else if (modo === 'senha' && !etapa) {
+    titulo = 'Esqueceu a senha?'; sub = 'Mandamos um código para você criar outra';
+    corpo = campo('✉️', 'E-mail da conta', `type="email" name="email" required autocomplete="email" placeholder="seu@email.com" value="${esc(ls.get('rv:email', ''))}"`) +
+      `<button class="btn-marca" style="margin-top:6px">Mandar código</button>
+      <p style="text-align:center;margin:16px 0 0;font-size:.9rem"><a href="#" data-modo="entrar">← Voltar para o login</a></p>`;
+  } else {
+    titulo = 'Confira seu e-mail'; sub = 'Digite o código de 6 números';
+    corpo = `<p style="color:#9ba4c8;margin:0 0 14px;text-align:center;font-size:.9rem">Enviado para <b style="color:var(--creme)">${esc(etapa.email)}</b><br>(olhe também o spam)</p>
+      <input type="text" name="codigo" inputmode="numeric" maxlength="6" required autocomplete="one-time-code" placeholder="••••••" style="font-size:1.8rem;letter-spacing:10px;text-align:center;font-weight:800;background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.1);color:var(--creme);min-height:62px;border-radius:14px;margin-bottom:14px">
+      ${modo === 'senha' ? campo('🔒', 'Nova senha', 'type="password" name="senha" minlength="6" required autocomplete="new-password" placeholder="Mínimo 6 caracteres"', true) : ''}
+      <button class="btn-marca">${modo === 'senha' ? 'Salvar nova senha' : 'Criar conta'}</button>
+      <p style="text-align:center;margin:16px 0 0;font-size:.9rem"><a href="#" data-reenviar="1">Mandar o código de novo</a></p>`;
+  }
+  $('#tela').innerHTML = `<div class="login-wrap">
+    <img class="login-logo" src="logo.jpg" alt="${esc(NOME)} — ${esc(SLOGAN)}">
+    <h1 class="login-titulo">${titulo}</h1>
+    <p class="login-sub">${sub}</p>
+    ${pend ? '<div class="login-aviso">🧳 Você recebeu um convite para uma viagem. Entre ou crie sua conta para participar.</div>' : ''}
+    <div class="login-card">
+      ${etapa ? '' : `<div class="seg">${aba('entrar', 'Entrar')}${aba('criar', 'Criar conta')}</div>`}
+      <form id="f-conta">${corpo}</form>
+    </div>
+    <p class="login-rodape">${esc(NOME)} · ${esc(SLOGAN)}</p>
   </div>`;
+  $$('.olho').forEach(b => b.onclick = () => { const i = b.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? '👁' : '🙈'; });
   $$('[data-modo]').forEach(b => b.onclick = e => { e.preventDefault(); telaConta(b.dataset.modo); });
   const f = $('#f-conta');
   const re = $('[data-reenviar]'); if (re) re.onclick = async e => { e.preventDefault(); try { await chamar({ acao: 'contaCodigo', email: etapa.email, motivo: modo === 'senha' ? 'senha' : 'criar' }); toast('Código reenviado ✓'); } catch (err) { toast(err.servidor ? err.message : 'Sem internet.'); } };
   f.onsubmit = async e => {
     e.preventDefault();
-    const fd = new FormData(f), b = f.querySelector('button.pri'), txt = b.textContent;
+    const fd = new FormData(f), b = f.querySelector('button.btn-marca'), txt = b.textContent;
     b.disabled = true; b.textContent = 'Aguarde…';
     try {
       if (modo === 'entrar') {
@@ -462,6 +475,7 @@ function lerHash() {
 
 /* ---------- desenho das telas ---------- */
 function render() {
+  document.body.classList.remove('modo-login'); // a tela de login liga de novo se for ela
   if (S && S.login) {
     ['#abas', '#fab', '#btn-sync', '#btn-conta'].forEach(s => $(s).classList.add('oculto'));
     $('#btn-voltar').classList.remove('oculto');
