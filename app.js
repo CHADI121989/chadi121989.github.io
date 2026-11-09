@@ -153,8 +153,26 @@ function recebeu(j) {
 }
 function nome(id) { const p = pessoa(id); return p ? p.nome : '(removido)'; }
 function primeiroNome(id) { return nome(id).split(' ')[0]; }
-// Ícone da pessoa nas listas: 🙋 você, 👤 os outros.
-function avatar(id) { return `<span class="ico">${id === S.eu ? '🙋' : '👤'}</span>`; }
+// Ícone da pessoa nas listas: a foto de perfil, se tiver; senão 🙋 você, 👤 os outros.
+const fotoOk = f => /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(String(f || ''));
+function avatar(id) {
+  const p = pessoa(id);
+  return p && fotoOk(p.foto) ? `<span class="ico foto-perfil"><img src="${p.foto}" alt=""></span>` : `<span class="ico">${id === S.eu ? '🙋' : '👤'}</span>`;
+}
+// Reduz a foto escolhida para um quadrado de 128 px (uns 5 KB), cortando o centro.
+function fotoDePerfil(arq) {
+  return new Promise((ok, erro) => {
+    const img = new Image(), url = URL.createObjectURL(arq);
+    img.onload = () => {
+      const lado = Math.min(img.width, img.height), cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      cv.getContext('2d').drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, 128, 128);
+      URL.revokeObjectURL(url); ok(cv.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); erro(new Error('Não consegui abrir essa imagem.')); };
+    img.src = url;
+  });
+}
 // "faltam 11 dias" antes, "dia 2 de 5" durante, "encerrada" depois.
 function contagem(v) {
   const h = hoje(), dif = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 864e5);
@@ -501,7 +519,7 @@ function render() {
   $('#btn-sync').classList.toggle('oculto', !emViagem);
   $('#btn-conta').classList.toggle('oculto', !emViagem);
   $('.logo-top').classList.toggle('oculto', emViagem); // dentro da viagem, o espaço vai para o nome dela
-  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; }
+  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').innerHTML = eu && fotoOk(eu.foto) ? `<img src="${eu.foto}" alt="">` : esc(eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'); }
   status();
   if (!emViagem) {
     $('#titulo').textContent = NOME;
@@ -1787,7 +1805,10 @@ function menuConta() {
   if (!S || !S.dados) return;
   const eu = pessoa(S.eu), leg = legado();
   const f = janela(eu ? esc(eu.nome) + (souOrg() && !leg ? ' 👑' : '') : 'Minha conta', `
-    <p class="mut" style="margin-top:0">${esc(S.dados.viagem.nome)}${CONTA ? ' · ' + esc(CONTA.email) : eu && eu.email ? ' · ' + esc(eu.email) : ''}</p>
+    ${eu ? `<div class="perfil-topo"><span class="perfil-foto">${fotoOk(eu.foto) ? `<img src="${eu.foto}" alt="">` : esc(eu.nome.trim().charAt(0).toUpperCase())}</span>
+      <div class="btns" style="justify-content:center"><label class="btn mini">📷 ${fotoOk(eu.foto) ? 'Trocar foto' : 'Colocar foto'}<input type="file" accept="image/*" id="foto-perfil" hidden></label>
+      ${fotoOk(eu.foto) ? '<button class="btn mini perigo" value="semfoto">Tirar foto</button>' : ''}</div></div>` : ''}
+    <p class="mut" style="margin-top:0;text-align:center">${esc(S.dados.viagem.nome)}${CONTA ? ' · ' + esc(CONTA.email) : eu && eu.email ? ' · ' + esc(eu.email) : ''}</p>
     <div style="display:grid;gap:8px">
       ${eu ? '<button class="btn lg" value="dados">✏️ Meus dados nesta viagem (Pix, datas…)</button>' : ''}
       <button class="btn lg" value="hist">🕓 Histórico de alterações</button>
@@ -1795,8 +1816,19 @@ function menuConta() {
       ${CONTA ? '<button class="btn lg" value="senhaConta">🔑 Trocar a senha da conta</button><button class="btn lg perigo" value="sairConta">🚪 Sair da conta</button>'
         : leg ? '<button class="btn lg" value="quem">🔄 Trocar quem sou eu</button>' : '<button class="btn lg" value="senha">🔑 Trocar minha senha</button><button class="btn lg" value="sair">🚪 Sair da minha conta</button>'}
     </div>`);
+  const inp = $('#foto-perfil', f);
+  if (inp) inp.onchange = async () => {
+    const arq = inp.files[0];
+    if (!arq) return;
+    try {
+      const foto = await fotoDePerfil(arq);
+      op({ op: 'salvar', tipo: 'pessoa', item: { ...pessoa(S.eu), foto } });
+      toast('Foto salva ✓'); menuConta();
+    } catch (err) { toast(err.message); }
+  };
   f.onsubmit = e => {
     const b = e.submitter && e.submitter.value;
+    if (b === 'semfoto') { e.preventDefault(); op({ op: 'salvar', tipo: 'pessoa', item: { ...pessoa(S.eu), foto: '' } }); toast('Foto removida.'); menuConta(); return; }
     if (b === 'dados') { e.preventDefault(); formPessoa(eu); }
     if (b === 'senha') { e.preventDefault(); trocarSenha('', false); }
     if (b === 'quem') { e.preventDefault(); quemSouEu(); }
