@@ -726,9 +726,9 @@ function telaAcerto() {
   }
   // 2) Pix aguardando confirmação (os meus)
   if (aguardando.length) {
-    html += `<div class="titulo-sec">⏳ Pix aguardando confirmação</div><div class="cartao" style="padding:4px 16px"><ul class="lista">${aguardando.map(a => {
+    html += `<div class="titulo-sec">⏳ Pagamentos aguardando confirmação</div><div class="cartao" style="padding:4px 16px"><ul class="lista">${aguardando.map(a => {
       const recebe = meusIds.includes(a.para) || org;
-      return `<li><span class="ico">⏳</span><span class="meio"><b>${esc(nome(a.de))} → ${esc(nome(a.para))}</b><small>${fmtData(a.data)}</small></span><span class="num">${brl(C.centavos(a.valor))}</span></li>
+      return `<li><span class="ico">⏳</span><span class="meio"><b>${esc(nome(a.de))} → ${esc(nome(a.para))}</b><small>${fmtData(a.data)}${a.obs ? ' · ' + esc(a.obs) : ''}</small></span><span class="num">${brl(C.centavos(a.valor))}</span></li>
         ${recebe ? `<li style="border-top:0;padding-top:0;justify-content:flex-end"><button class="btn mini pri" data-recebi="${esc(a.id)}">Recebi ✓</button><button class="btn mini" data-naorecebi="${esc(a.id)}">Não recebi</button></li>` : ''}`;
     }).join('')}</ul></div>`;
   }
@@ -744,7 +744,7 @@ function telaAcerto() {
     return `<div class="transf"><div class="quem">${outro ? (eu_paga ? `<b>${esc(nome(resp))}</b> paga para <b>${esc(nome(t.para))}</b> (inclui a sua parte)` : `<b>${esc(nome(t.de))}</b> paga para <b>${esc(nome(resp))}</b> (inclui a sua parte)`)
       : eu_paga ? `Você paga para <b>${esc(nome(t.para))}</b>` : `<b>${esc(nome(t.de))}</b> paga para você`}<div class="num" style="font-size:1.15rem;font-weight:700">${brl(t.valor)}</div>
       ${avisado ? `<div class="peq" style="color:var(--ali)">⏳ ${brl(avisado)} avisado, aguardando confirmação</div>` : ''}</div>
-      ${outro ? '' : `<div class="btns">${eu_paga ? (rec && rec.pix ? `<button class="btn mini pri" data-pixm="${i}">Pagar com Pix</button>` : `<span class="peq mut">${esc(primeiroNome(t.para))} ainda não cadastrou Pix</span>`) : `<button class="btn mini" data-cobrarm="${i}" style="background:#25d366;border-color:#25d366;color:#fff">Cobrar no WhatsApp</button>`}<button class="btn mini" data-pagom="${i}">${eu_paga ? 'Já paguei' : 'Já recebi'}</button></div>`}</div>`;
+      ${outro ? '' : `<div class="btns">${eu_paga ? `<button class="btn mini pri" data-pixm="${i}">Pagar</button>` :`<button class="btn mini" data-cobrarm="${i}" style="background:#25d366;border-color:#25d366;color:#fff">Cobrar no WhatsApp</button>`}<button class="btn mini" data-pagom="${i}">${eu_paga ? 'Já paguei' : 'Já recebi'}</button></div>`}</div>`;
   }).join('') + '</div>';
   // Organizador: além do próprio acerto, vê a situação de todos e pode cobrar qualquer um.
   if (org) {
@@ -760,14 +760,14 @@ function telaAcerto() {
     <button class="ic-btn" data-desfaz="${esc(a.id)}" aria-label="Desfazer" title="Desfazer">✕</button></li>`).join('')}</ul></div>`;
   html += `<button class="btn lg" id="acerto-manual">Registrar outro pagamento</button><p class="dica" style="text-align:center">A situação de todo o grupo está na aba 📊 Resumo.</p>`;
   $('#tela').innerHTML = html;
-  $$('[data-pixm]').forEach(b => b.onclick = () => janelaPix(minhas[b.dataset.pixm]));
+  $$('[data-pixm]').forEach(b => b.onclick = () => janelaPagar(minhas[b.dataset.pixm]));
   $$('[data-cobrarm]').forEach(b => b.onclick = () => cobrarWhats(minhas[b.dataset.cobrarm]));
   $$('[data-cobrart]').forEach(b => b.onclick = () => cobrarWhats(ag.transf[b.dataset.cobrart]));
-  $$('[data-pagot]').forEach(b => b.onclick = () => { const t = ag.transf[b.dataset.pagot]; if (confirm(`Registrar que ${nome(t.de)} pagou ${brl(t.valor)} para ${nome(t.para)}?`)) registrarPix(t.de, t.para, t.valor / 100, 'registrado pelo organizador'); });
+  $$('[data-pagot]').forEach(b => b.onclick = () => formJaPaguei(ag.transf[b.dataset.pagot], 'org'));
   $$('[data-pagitem]').forEach(b => b.onclick = () => pagarItem(S.dados.gastos.find(g => g.id === b.dataset.pagitem), Number(b.dataset.falta)));
-  $$('[data-pagom]').forEach(b => b.onclick = () => { const t = minhas[b.dataset.pagom]; if (confirm(`Confirmar: ${nome(t.de)} pagou ${brl(t.valor)} para ${nome(t.para)}?`)) registrarPix(t.de, t.para, t.valor / 100, ''); });
+  $$('[data-pagom]').forEach(b => b.onclick = () => { const t = minhas[b.dataset.pagom]; formJaPaguei(t, t.de === resp ? 'paguei' : 'recebi'); });
   $$('[data-recebi]').forEach(b => b.onclick = () => { const a = S.dados.acertos.find(x => x.id === b.dataset.recebi); op({ op: 'salvar', tipo: 'acerto', item: { ...a, status: 'confirmado', confirmadoPor: S.eu } }); toast('Recebimento confirmado ✓'); });
-  $$('[data-naorecebi]').forEach(b => b.onclick = () => { if (confirm('Marcar que NÃO recebeu esse Pix? O aviso será apagado.')) op({ op: 'excluir', tipo: 'acerto', id: b.dataset.naorecebi }); });
+  $$('[data-naorecebi]').forEach(b => b.onclick = () => { if (confirm('Marcar que NÃO recebeu esse pagamento? O aviso será apagado.')) op({ op: 'excluir', tipo: 'acerto', id: b.dataset.naorecebi }); });
   $$('[data-desfaz]').forEach(b => b.onclick = () => { if (confirm('Desfazer este pagamento?')) op({ op: 'excluir', tipo: 'acerto', id: b.dataset.desfaz }); });
   $('#acerto-manual').onclick = () => formAcerto();
 }
@@ -794,13 +794,61 @@ function pagarItem(g, falta) {
     <div class="grade2"><label class="cp"><span>Valor</span><input type="text" inputmode="decimal" name="valor" required value="${esc(fmtNum(falta / 100))}"></label>
     <label class="cp"><span>Data</span><input type="date" name="data" value="${hoje()}"></label></div>
     <label class="cp"><span>Paguei para</span><select name="para" required>${S.dados.pessoas.filter(p => p.id !== S.eu).map(p => `<option value="${esc(p.id)}" ${p.id === padrao ? 'selected' : ''}>${esc(p.nome)}${pagadores.includes(p.id) ? ' (pagou a conta)' : p.papel === 'organizador' ? ' (organizador)' : ''}</option>`).join('')}</select></label>
+    ${campoForma()}
     <p class="dica">Quem recebeu confirma no app dele. Até lá aparece "aguardando confirmação".</p>`,
     `<button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn pri" value="ok">Registrar</button>`);
   f.onsubmit = e => {
     if (!e.submitter || e.submitter.value !== 'ok') return;
     const fd = new FormData(f), v = lerNum(fd.get('valor'));
     if (!(v > 0)) { e.preventDefault(); return toast('Informe o valor.'); }
-    registrarPix(S.eu, fd.get('para'), v, g.descricao, 'AR~' + g.id + '~' + Date.now().toString(36), fd.get('data'));
+    registrarPix(S.eu, fd.get('para'), v, obsForma(fd, g.descricao), 'AR~' + g.id + '~' + Date.now().toString(36), fd.get('data'));
+  };
+}
+
+/* Forma de pagamento: fica escrita na observação do pagamento (ex.: "💳 Cartão · Pousada"). */
+const FORMAS = { pix: ['💠', 'Pix'], cartao: ['💳', 'Cartão'], combinado: ['🤝', 'Combinado'] };
+const campoForma = (atual = 'pix') => `<span class="rot-cp">Como foi pago</span>
+  <div class="formas-mini">${Object.entries(FORMAS).map(([k, [ic, r]]) => `<label><input type="radio" name="forma" value="${k}" ${k === atual ? 'checked' : ''}><span>${ic} ${r}</span></label>`).join('')}</div>
+  <p class="dica" style="margin-top:-4px">Combinado = dinheiro ou outro jeito que vocês acertaram.</p>`;
+const obsForma = (fd, ...resto) => { const fm = FORMAS[fd.get('forma')]; return [fm ? fm.join(' ') : '', ...resto].filter(Boolean).join(' · '); };
+
+// Botão "Pagar" do acerto: escolhe como pagar (Pix, cartão ou combinar com a pessoa).
+function janelaPagar(t) {
+  const rec = pessoa(t.para), pn = esc(primeiroNome(t.para)), temPix = !!(rec && rec.pix);
+  const f = janela('Como você vai pagar?', `
+    <p style="margin-top:0;text-align:center">Você paga <b class="num">${brl(t.valor)}</b> para <b>${esc(nome(t.para))}</b></p>
+    <div class="formas">
+      <button class="forma" value="pix" ${temPix ? '' : 'disabled'}><b>💠</b><span>Pix<small>${temPix ? 'QR Code ou copia e cola, já com o valor' : pn + ' ainda não cadastrou a chave Pix (aba Grupo)'}</small></span></button>
+      <button class="forma" value="cartao"><b>💳</b><span>Cartão<small>maquininha ou link de pagamento de ${pn}. Depois é só registrar.</small></span></button>
+      <button class="forma" value="combinar"><b>🤝</b><span>Combinar com ${pn}<small>dinheiro ou outro jeito: abre o WhatsApp com a mensagem pronta</small></span></button>
+    </div>`);
+  f.onsubmit = e => {
+    const b = e.submitter && e.submitter.value;
+    if (b === 'pix') { e.preventDefault(); janelaPix(t); }
+    else if (b === 'cartao') { e.preventDefault(); formJaPaguei(t, 'paguei', 'cartao'); }
+    else if (b === 'combinar') {
+      const txt = `Oi, ${primeiroNome(t.para)}! 🧳 Pelo acerto da viagem *${S.dados.viagem.nome}*, eu te devo *${brl(t.valor)}*. Como prefere receber: Pix, cartão ou dinheiro?`;
+      window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+      setTimeout(() => toast('Depois de pagar, toque em "Já paguei" e escolha "Combinado".'), 300);
+    }
+  };
+}
+
+// "Já paguei" / "Já recebi" / organizador registrando: valor (pode ser só uma parte), data e forma.
+function formJaPaguei(t, quem, forma) {
+  const titulo = quem === 'recebi' ? 'Já recebi' : quem === 'org' ? 'Registrar pagamento' : 'Já paguei';
+  const f = janela(titulo, `
+    <p style="margin-top:0;text-align:center"><b>${esc(nome(t.de))}</b> → <b>${esc(nome(t.para))}</b></p>
+    <div class="grade2"><label class="cp"><span>Valor</span><input type="text" inputmode="decimal" name="valor" required value="${esc(fmtNum(t.valor / 100))}"></label>
+    <label class="cp"><span>Data</span><input type="date" name="data" value="${hoje()}"></label></div>
+    ${campoForma(forma || 'pix')}
+    ${quem === 'paguei' ? `<p class="dica">${esc(primeiroNome(t.para))} confirma no app que recebeu. Até lá aparece "aguardando confirmação".</p>` : ''}`,
+    `<button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn pri" value="ok">Registrar</button>`);
+  f.onsubmit = e => {
+    if (!e.submitter || e.submitter.value !== 'ok') return;
+    const fd = new FormData(f), v = lerNum(fd.get('valor'));
+    if (!(v > 0)) { e.preventDefault(); return toast('Informe o valor.'); }
+    registrarPix(t.de, t.para, v, obsForma(fd, quem === 'org' ? 'registrado pelo organizador' : ''), undefined, fd.get('data'));
   };
 }
 
@@ -2055,11 +2103,12 @@ function formCarro(c) {
 
 function formAcerto() {
   const f = janela('Pagamento entre amigos', `
-    <p class="mut" style="margin-top:0">Use para registrar um Pix ou dinheiro que alguém já passou para outra pessoa.</p>
+    <p class="mut" style="margin-top:0">Use para registrar um pagamento (Pix, cartão ou dinheiro) que alguém já passou para outra pessoa.</p>
     <div class="grade2"><label class="cp"><span>Quem pagou</span><select name="de" required>${opcoesPessoas(S.eu, 'Escolha…')}</select></label>
     <label class="cp"><span>Para quem</span><select name="para" required>${opcoesPessoas('', 'Escolha…')}</select></label></div>
     <div class="grade2"><label class="cp"><span>Valor (R$)</span><input type="text" inputmode="decimal" name="valor" required></label>
     <label class="cp"><span>Data</span><input type="date" name="data" value="${hoje()}"></label></div>
+    ${campoForma()}
     <label class="cp"><span>Observação</span><input type="text" name="obs"></label>`,
     `<button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn pri" value="ok">Registrar</button>`);
   f.onsubmit = e => {
@@ -2068,7 +2117,7 @@ function formAcerto() {
     if (!fd.get('de') || !fd.get('para') || fd.get('de') === fd.get('para')) { e.preventDefault(); return toast('Escolha duas pessoas diferentes.'); }
     if (!(v > 0)) { e.preventDefault(); return toast('Informe o valor.'); }
     if (!souOrg() && !legado() && fd.get('de') !== S.eu && fd.get('para') !== S.eu) { e.preventDefault(); return toast('Você só registra pagamento que você fez ou recebeu.'); }
-    registrarPix(fd.get('de'), fd.get('para'), v, String(fd.get('obs')).trim());
+    registrarPix(fd.get('de'), fd.get('para'), v, obsForma(fd, String(fd.get('obs')).trim()), undefined, fd.get('data'));
   };
 }
 
@@ -2090,7 +2139,7 @@ function janelaPix(t) {
   f.onsubmit = e => {
     const b = e.submitter && e.submitter.value;
     if (b === 'copiar') { e.preventDefault(); copiar(codigo); }
-    if (b === 'pago') registrarPix(t.de, t.para, t.valor / 100, 'Pix');
+    if (b === 'pago') registrarPix(t.de, t.para, t.valor / 100, FORMAS.pix.join(' '));
   };
 }
 
