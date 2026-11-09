@@ -166,6 +166,29 @@ dialog::backdrop{background:rgba(5,15,13,.55)}
 .vantagens div{background:var(--card);border:1px solid var(--lin);border-radius:12px;padding:10px;font-size:.84rem}
 .vantagens b{display:block;font-size:1.2rem}
 
+/* Tela de login: cheia, centralizada, sem a barra de cima */
+body.modo-login{padding-bottom:0}
+body.modo-login header{display:none}
+body.modo-login main{max-width:none;padding:0}
+.login-wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px calc(32px + env(safe-area-inset-bottom));
+  background:radial-gradient(60% 40% at 15% 10%,rgba(247,147,30,.18),transparent 70%),radial-gradient(55% 45% at 90% 20%,rgba(58,160,240,.18),transparent 70%),radial-gradient(60% 50% at 50% 100%,rgba(42,212,180,.16),transparent 70%),var(--marinho)}
+.login-logo{width:132px;height:132px;border-radius:30px;object-fit:cover;box-shadow:0 12px 40px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08)}
+.login-titulo{color:var(--creme);font-size:1.45rem;font-weight:800;margin:18px 0 2px;text-align:center}
+.login-sub{color:#9ba4c8;font-size:.92rem;margin:0 0 22px;text-align:center}
+.login-card{width:100%;max-width:400px;background:rgba(20,29,68,.92);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);color:var(--creme);backdrop-filter:blur(6px)}
+.login-card label.cp>span{color:#9ba4c8}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(0,0,0,.25);border-radius:14px;padding:4px;margin-bottom:20px}
+.seg button{border:0;background:transparent;color:#9ba4c8;font-weight:700;padding:10px;border-radius:11px;cursor:pointer;font-size:.95rem}
+.seg button[aria-pressed="true"]{background:var(--agua);color:var(--marinho);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.campo-ic{position:relative}
+.campo-ic>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-style:normal;opacity:.75;pointer-events:none}
+.campo-ic>input{padding-left:44px!important;background:rgba(0,0,0,.25)!important;border-color:rgba(255,255,255,.1)!important;color:var(--creme)!important;min-height:50px!important;border-radius:12px!important}
+.campo-ic>button.olho{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#9ba4c8;cursor:pointer;font-size:1rem;padding:6px}
+.btn-marca{width:100%;border:0;border-radius:14px;min-height:52px;font-weight:800;font-size:1.02rem;color:#fff;background:var(--marca);text-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer;box-shadow:0 8px 22px rgba(42,212,180,.25)}
+.btn-marca:disabled{opacity:.7}
+.login-card a{color:var(--agua)}
+.login-rodape{color:#6f79a3;font-size:.78rem;margin-top:18px;text-align:center}
+.login-aviso{width:100%;max-width:400px;background:rgba(42,212,180,.12);border:1px solid rgba(42,212,180,.35);color:var(--creme);border-radius:14px;padding:10px 14px;font-size:.88rem;margin-bottom:14px;text-align:center}
 dialog #toast{bottom:calc(96px + env(safe-area-inset-bottom))}
 #toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
