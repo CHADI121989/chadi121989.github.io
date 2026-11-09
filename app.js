@@ -501,7 +501,7 @@ function render() {
   $('#btn-sync').classList.toggle('oculto', !emViagem);
   $('#btn-conta').classList.toggle('oculto', !emViagem);
   $('.logo-top').classList.toggle('oculto', emViagem); // dentro da viagem, o espaço vai para o nome dela
-  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = '👤'; }
+  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; }
   status();
   if (!emViagem) {
     $('#titulo').textContent = NOME;
