@@ -58,6 +58,14 @@ header .sub{font-size:.8rem;opacity:.85}
 .ic-btn:hover{background:rgba(255,255,255,.14)}
 #btn-conta{flex:none;width:38px;height:38px;border-radius:50%;background:var(--marca);color:#fff;font-weight:800;font-size:1.05rem;text-shadow:0 1px 2px rgba(0,0,0,.3);box-shadow:0 0 0 2px rgba(255,255,255,.3),0 4px 12px rgba(0,0,0,.25)}
 #btn-conta:hover{background:var(--marca);filter:brightness(1.08)}
+#btn-conta img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+#btn-conta:has(img){padding:2px}
+/* Foto de perfil: círculo com borda em degradê da marca */
+.perfil-topo{display:grid;justify-items:center;gap:10px;margin-bottom:10px}
+.perfil-foto{width:88px;height:88px;border-radius:50%;padding:3px;background:var(--marca);display:grid;place-items:center;color:#fff;font-size:2.2rem;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 18px rgba(16,26,60,.2)}
+.perfil-foto img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid var(--card)}
+.lista .ico.foto-perfil{border-radius:50%;padding:2px;background:var(--marca)}
+.lista .ico.foto-perfil img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .status{font-size:.75rem;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.18);white-space:nowrap}
 
 main{max-width:760px;margin:0 auto;padding:16px}
