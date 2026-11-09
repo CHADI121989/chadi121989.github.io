@@ -1,5 +1,5 @@
 // Guarda o app no celular para abrir sem internet. Suba o nÃºmero do CACHE a cada mudanÃ§a no app.
-const CACHE = 'racha-v30';
+const CACHE = 'racha-v31';
 const ARQUIVOS = ['./', 'index.html', 'app.js', 'calc.js', 'config.js', 'manifest.webmanifest', 'favicon.png', 'logo.jpg', 'logo-transparente.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png',
   'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'];
 
@@ -16,7 +16,9 @@ self.addEventListener('fetch', e => {
   if (url.hostname.endsWith('google.com') || url.hostname.endsWith('googleusercontent.com') || url.hostname.includes('awesomeapi')) return;
   // (jsQR, do jsdelivr, entra no cache na primeira vez que alguÃ©m lÃª um cupom)
   // Rede primeiro (pega versÃ£o nova), cache se estiver sem internet.
-  e.respondWith(fetch(req).then(r => {
+  // Arquivos do próprio app: sempre confere com o site (sem isso o celular usa a cópia de até 10 min atrás).
+  const doApp = url.origin === self.location.origin;
+  e.respondWith(fetch(doApp ? new Request(req, { cache: 'no-cache' }) : req).then(r => {
     if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); }
     return r;
   }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match('index.html'))));
