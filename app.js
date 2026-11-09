@@ -153,10 +153,8 @@ function recebeu(j) {
 }
 function nome(id) { const p = pessoa(id); return p ? p.nome : '(removido)'; }
 function primeiroNome(id) { return nome(id).split(' ')[0]; }
-// Bolinha com a inicial da pessoa, sempre na mesma cor para a mesma pessoa.
-const CORES_AV = ['#f7931e', '#2ad4b4', '#3aa0f0', '#ef6b9a', '#9b7bf2', '#f2b632', '#45c27a'];
-function corDe(id) { let h = 0; for (const ch of String(id || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return CORES_AV[h % CORES_AV.length]; }
-function avatar(id, cls = 'av') { return `<span class="${cls}" style="--av:${corDe(id)}" title="${esc(nome(id))}">${esc(nome(id).trim().charAt(0).toUpperCase() || '?')}</span>`; }
+// Ícone da pessoa nas listas: 🙋 você, 👤 os outros.
+function avatar(id) { return `<span class="ico">${id === S.eu ? '🙋' : '👤'}</span>`; }
 // "faltam 11 dias" antes, "dia 2 de 5" durante, "encerrada" depois.
 function contagem(v) {
   const h = hoje(), dif = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 864e5);
@@ -503,7 +501,7 @@ function render() {
   $('#btn-sync').classList.toggle('oculto', !emViagem);
   $('#btn-conta').classList.toggle('oculto', !emViagem);
   $('.logo-top').classList.toggle('oculto', emViagem); // dentro da viagem, o espaço vai para o nome dela
-  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; $('#btn-conta').style.background = eu ? corDe(eu.id) : ''; }
+  if (emViagem) { const eu = pessoa(S.eu); $('#btn-conta').textContent = eu ? eu.nome.trim().charAt(0).toUpperCase() : '👤'; }
   status();
   if (!emViagem) {
     $('#titulo').textContent = NOME;
@@ -516,10 +514,9 @@ function render() {
   const eu = pessoa(S.eu);
   const np = S.dados.pessoas.length;
   $('#subtitulo').textContent = [v.inicio && v.fim ? `${fmtData(v.inicio)} a ${fmtData(v.fim)}` : '', np + (np === 1 ? ' pessoa' : ' pessoas')].filter(Boolean).join(' · ');
-  const cont = contagem(v), MAX_AV = 5;
-  $('#hero-v').innerHTML = `<div class="hv-chips">${v.destino ? `<span class="hv-chip">📍 ${esc(v.destino)}</span>` : ''}${cont ? `<span class="hv-chip">${cont}</span>` : ''}</div>
-    <button class="hv-avs" id="hv-grupo" aria-label="Ver o grupo">${S.dados.pessoas.slice(0, MAX_AV).map(p => avatar(p.id)).join('')}${np > MAX_AV ? `<span class="av mais">+${np - MAX_AV}</span>` : ''}</button>`;
-  $('#hv-grupo').onclick = () => { ABA = 'grupo'; ls.set('rv:aba', ABA); render(); scrollTo(0, 0); };
+  const cont = contagem(v);
+  $('#hero-v').innerHTML = `<div class="hv-chips">${v.destino ? `<span class="hv-chip">📍 ${esc(v.destino)}</span>` : ''}${cont ? `<span class="hv-chip">${cont}</span>` : ''}</div>`;
+  $('#hero-v').classList.toggle('oculto', !v.destino && !cont);
   document.title = v.nome + ' · ' + NOME;
   $$('#abas button').forEach(b => b.setAttribute('aria-current', b.dataset.aba === ABA ? 'page' : 'false'));
   ({ gastos: telaGastos, saldos: telaAcerto, voos: telaVoos, roteiro: telaRoteiro, plano: telaRoteiro, resumo: telaResumo, grupo: telaGrupo }[ABA] || telaGastos)();
@@ -941,7 +938,7 @@ function telaVoos() {
   ps.forEach(p => {
     const linha = tr => { const s = sitDe(p.id, tr); return `${SIT[s].i} ${TRECHOS[tr]}`; };
     const pend = Object.keys(TRECHOS).filter(tr => sitDe(p.id, tr) === 'comprada');
-    html += `<li class="${passagemDe(p.id, 'ida') || passagemDe(p.id, 'volta') ? 'clica' : ''}" data-ver="${esc(p.id)}">${avatar(p.id, 'ico av')}
+    html += `<li class="${passagemDe(p.id, 'ida') || passagemDe(p.id, 'volta') ? 'clica' : ''}" data-ver="${esc(p.id)}">${avatar(p.id)}
       <span class="meio"><b>${esc(p.nome)}</b><small>${linha('ida')} · ${linha('volta')}${p.origem ? ' · sai de ' + esc(p.origem) : ''}</small></span>
       ${org && pend.length ? `<button class="btn mini pri" data-confirmar="${esc(p.id)}">Confirmar</button>` : ''}</li>`;
   });
@@ -1677,7 +1674,7 @@ function telaGrupo() {
     const acesso = leg ? '' : p.papel === 'organizador' ? '👑 organizador' : !p.temSenha ? '🔒 sem senha ainda' : p.trocarSenha ? 'ainda não criou a senha dele' : '';
     const extra = [org ? acesso : (p.papel === 'organizador' ? '👑 organizador' : ''), p.chegada || p.saida ? `${p.chegada ? 'chega ' + fmtData(p.chegada) : ''}${p.chegada && p.saida ? ', ' : ''}${p.saida ? 'sai ' + fmtData(p.saida) : ''}` : '', Number(p.peso) && Number(p.peso) !== 1 ? `conta como ${fmtNum(p.peso)}` : '', ...(p.restricoes || []).map(r => (C.RESTRICOES[r] || r).split(' ').slice(1).join(' ').toLowerCase()), p.pix ? 'Pix ✓' : 'sem Pix'].filter(Boolean).join(' · ');
     const pode = org || p.id === S.eu;
-    return `<li class="${pode ? 'clica' : ''}" data-p="${esc(p.id)}">${avatar(p.id, 'ico av')}<span class="meio"><b>${esc(p.nome)}${p.id === S.eu ? ' (você)' : ''}</b><small>${esc(extra)}</small></span>${pode ? '<span class="mut">›</span>' : ''}</li>`;
+    return `<li class="${pode ? 'clica' : ''}" data-p="${esc(p.id)}">${avatar(p.id)}<span class="meio"><b>${esc(p.nome)}${p.id === S.eu ? ' (você)' : ''}</b><small>${esc(extra)}</small></span>${pode ? '<span class="mut">›</span>' : ''}</li>`;
   }).join('')}</ul>${org ? '<button class="btn lg sua" id="add-p" style="margin:6px 0 12px">+ Adicionar pessoa</button>' : '<p class="dica" style="margin:6px 0 12px">Só o organizador cadastra pessoas. Toque no seu nome para editar seus dados.</p>'}</div>
   ${org || (S.dados.carros || []).length ? `<div class="titulo-sec">Carros (${(S.dados.carros || []).length})</div>
   <div class="cartao" style="padding:4px 16px">
@@ -1726,7 +1723,7 @@ function quandoFoi(iso) {
 function janelaHistorico() {
   const h = S.dados.historico || [];
   janela('🕓 Histórico de alterações', h.length ? `<p class="mut peq" style="margin-top:0">Tudo o que foi lançado, mudado ou apagado na viagem (mais recente primeiro).</p>
-    <ul class="lista">${h.map(x => `<li>${avatar(x.pessoa, 'ico av pq')}<span class="meio"><b style="white-space:normal">${esc(nome(x.pessoa))}</b><small style="white-space:normal">${esc(x.texto)}</small></span><span class="mut peq" style="white-space:nowrap">${quandoFoi(x.quando)}</span></li>`).join('')}</ul>`
+    <ul class="lista">${h.map(x => `<li><span class="ico" style="width:34px;height:34px;font-size:.9rem;font-weight:800">${esc(nome(x.pessoa).charAt(0))}</span><span class="meio"><b style="white-space:normal">${esc(nome(x.pessoa))}</b><small style="white-space:normal">${esc(x.texto)}</small></span><span class="mut peq" style="white-space:nowrap">${quandoFoi(x.quando)}</span></li>`).join('')}</ul>`
     : '<div class="vazio"><b>🕓</b>Nada registrado ainda.</div>');
 }
 
